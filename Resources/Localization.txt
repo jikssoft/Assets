@@ -1,0 +1,31 @@
+﻿KEY,ENGLISH,ﺔﻴﺑﺮﻌﻟﺍ,简体字,繁體字,Nederlands,Français,DEUTSCH,ITALIANO,日本語,한국어,Portugués,русский язык,Español,Türkçe
+Continue,Continue?,متابعة؟,继续?,繼續?,Doorgaan?,Continuer?,Fortsetzen?,Continua?,続行?,이어하기?,Continuar?,Продолжить?,Continuar?,Devam?
+Failed,Failed,فشل,失败,失敗,Mislukt,Échec,Fehlg.,Fallito,失敗,실패,Falhou,Сбой,Failed,Başarısız
+Fast,Fast,سريع,快,快,Snel,Rapide,Schnell,Veloce,速い,빠르게,Rápida,Высокая,Rápida,Hızlı
+Free,Free,مجاناً,免费,免費,Gratis,Gratuit,Frei,Gratis,無料,무료,Grátis,Бесплатно,Gratis,Ücretsiz
+Gifts,Gifts,الهدايا,礼物,禮品,Geschenken,Cadeaux,Geschenke,Regali,ギフト,선물,Presentes,Подарки,Regalos,Hediyeler
+Good,Good,جيد,良好,好,Goed,Bien,Gut,Buona,良い,좋음,Boa,Хорошее,Bueno,İyi
+New,New,جديدة,新,新,Nieuw,Nouveau,Neu,Nuovo,新着,신규,Novo,НОВОЕ,Nuevo,YENİ
+Next,Next,التالي,下一页,下一步,Volgende,Suivant,Weiter,Successiva,次へ,다음,Seguinte,Далее,Siguiente,Sonraki
+On,On,تشغيل,开,開,Aan,ON,Ein,Sì,ON,켜짐,Ligado,Вкл,Act,Açık
+Off,Off,تشغيل,关,關,uit,OFF,Aus,No,OFF,꺼짐,deslig,выкл,des,Kapalı
+Perfect Only,Perfect\nOnly,الكما\nفقط,完美的,完美,Perfect\nalleen,Parfait\nseulement,Nur\nperfekt,Perfetto\nsolo,パーフェクトのみ,오직\n퍼펙트,Perfeito\napenas,Только\nидеальный,Solo\nperfecto,Sadece\nmükemmel
+Random,Random,عشوائي,随机,隨機,Willek,Aléat,Zufall,Casuale,ﾗﾝﾀﾞﾑ,랜덤,Aleatório,Случайно,Aleatorio,Rstgle
+Release,Release,التحرير,释放,釋放,Vrijgeven,Relâcher,Freigeben,Rilascia,リリース,떼기,Liberte,Отпустите,Suelta,Serbest bırak
+Reminders,Reminders,تذكيرات,提醒,提醒,Herinner,Rappels,Erinnerungen,Promemoria,ﾘﾏｲﾝﾀﾞｰ,리마인더,Lembretes,Напомин,Recordatorios,Hatırltclr
+Select,Select,تحديد,选择,選擇,Selecteren,Sélect.,Auswählen,Seleziona,選択,선택,Seleccio.,Выбрать,Selecc,Seç
+Settings,Settings,الضبط,设置,設定,Instellingen,Paramètres,Einstell.,Impostaz.,設定,설정,Definições,Настр-ки,Ajustes,Ayarlar
+Shop,Shop,متجر,商店,商店,Winkel,Magasin,Geschäft,Negozio,ショップ,상점,Loja,Магазин,Tienda,Mağaza
+Slow,Slow,بطيء,慢,慢,Langzaam,Lente,Langsam,Lenta,遅い,느리게,Lenta,Низкая,Lenta,Yavaş
+Sound effect,Sound effect,مؤثرات صوتية,音效,音效,Geluidseffect,Effet sonore,Sound-Effekt,Effetto audio,サウンドエフェクト,음향 효과,Efeito de som,вуковой эффект,Efecto de sonido,Ses efekti
+Touch and hold,Touch and hold,النقر مع الاستمرار,长按,輕觸並按住,Tikken en vasthouden,Appui prolongé,Tippen und\nhalten,Tocco lungo,長押し,누르고 있기,Tocar sem soltar,Коснуться и удерживать,Pulsación larga,Dokun ve tut
+Vibration,Vibration,الاهتزاز,振动,震動,Trillen,Vibration,Vibrieren,Vibrazione,バイブ,진동,Vibração,Вибрация,Vibración,Titreşim
+Retry,Retry,حاول ثانية,重试,重試,Opnieuw,Réessayer,Wiederholen,Riprova,やり直す,다시 시도,Repetir,Повтор,Reintentar,Y.dene
+Country,English,ﺔﻴﺑﺮﻌﻟﺍ,简体字,繁體字,Nederlands,Français,Deutsch,Italiano,日本語,한국어,Portugués,русский язык,Español,Türkçe
+Exit,Exit?,ىخرج؟,出口?,出口?,Uitgang?,Sortie?,Ausgang?,Uscita?,出口?,종료?,Saída?,Выход?,Salida?,Çıkış?
+Completed,Completed,انتهى,已完成,已完成,Voltooid,Terminé,Abgeschlossen,Completato,完了,완료,Concluído,Завершено,Completado,Tamamlandı
+Duplicate,Duplicate,نسخة مطابقة,重复,重複,Dupliceren,Copier,Duplizieren,Duplica,重複,중복,Duplicar,Создать копию,Duplicar,Çoğalt
+Caution,Caution!,تحذير!,注意!,注意!,Waarschuwing!,Attention!,Warnung!,Attenzione!,注意!,주의!,Cuidado!,Внимание!,Precaución!,Dikkat!
+Very fast,Very fast,سريع جدا	,非常快,非常快,zeer snel,très rapide,sehr schnell,molto veloce,非常に高速です,매우 빠릅니다,muito rápido,Очень быстро,muy rápido,çok hızlı
+Cheer up,Cheer up! Complete LEVEL %%% and get a new drill,ابتهج! استكمال LEVEL %%% والحصول على تدريبات جديدة,振作起来！完成LEVEL %%%并获得新的钻取,振作起來！完成LEVEL %%%並獲得新的鑽取,Kop op! Voltooi LEVEL %%% en krijg een nieuwe boor,Courage! Complétez LEVEL %%% et obtenez une nouvelle foret,Kopf hoch! LEVEL %%% ausfüllen und einen neuen Bohrer bekommen,Tirati su! Completa LEVEL %%% e ottieni un nuovo trapano,元気づける！ LEVEL %%%を完了し、新しいドリルを取得する,힘내요! LEVEL %%%을 완료하고 새로운 드릴을 획득하세요,Anime-se! Complete LEVEL %%% e obtenha uma nova broca,Взбодритесь! Завершите LEVEL %%% и получите новое дрель,Alegrarse! Complete LEVEL %%% y obtenga un nuevo taladro,Neşelen! % LEVEL %% tamamlayın ve yeni bir matkap alın
+Rate us,Your good reviews are very helpful to us. Please cheer for TAP TAP DRILL.,ملاحظاتك جيدة هي مفيدة جدا بالنسبة لنا. يرجى يهتف ل TAP TAP DRILL,你的评论对我们很有帮助。 请为之一振TAP TAP DRILL。,你的評論對我們很有幫助。 請爲之一振TAP TAP DRILL。,Uw goede recensies zijn erg nuttig voor ons. Juicht alsjeblieft voor TAP TAP DRILL.,Vos bons examens nous sont très utiles. Please-vous à TAP TAP DRILL,Ihre guten Bewertungen sind sehr hilfreich für uns. Bitte jubeln Sie für TAP TAP DRILL.,Le tue buone recensioni sono molto utili per noi. Si prega di tifare per TAP TAP DRILL.,あなたの良いレビューは私たちに大きな力になります。 TAP TAP DRILLを応援してください。,플레이어님의 좋은 리뷰는 저희에게 큰 힘이 됩니다. 탭탭드릴을 응원해 주세요.,Suas boas críticas são muito úteis para nós. Por favor abrace o TAP TAP DRILL.,Ваши хорошие отзывы очень полезны для нас. Пожалуйста приветствуйте TAP TAP DRILL.,Sus buenas críticas son muy útiles para nosotros. Por favor anime a TAP TAP DRILL.,İyi değerlendirmeleriniz bize çok yardımcı oluyor. TAP TAP DRILL için lütfen tezahürat yapın

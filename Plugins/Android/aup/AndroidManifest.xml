@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.gigadrillgames.androidplugin" android:versionCode="1" android:versionName="1.0">  	
+  	<uses-sdk android:minSdkVersion="9"/>
+
+  	<!--Vibration-->
+  	<uses-permission android:name="android.permission.VIBRATE"/>
+  	<!--Vibration-->
+
+
+</manifest>
