@@ -450,3 +450,18 @@ version 1.7.2
  2. fixed bug on Auto Max volume after using listen with no beep on Speech Recognizer
  3. remove get contact info on demo reason suddenly it breaks because of the new updates on Androis OS
  we still finding away to fix this but it seems it's not allowed any more'
+
+ version 1.7.6
+ 08/26/2017
+
+ 1. update the version using unity3d 2017
+
+ version 1.7.7
+ 09/15/2017
+
+ 1. added image crop
+
+ version 1.7.8
+ 10/15/2017
+
+ 1. added sending sms

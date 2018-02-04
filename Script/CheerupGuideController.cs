@@ -18,6 +18,8 @@ public class CheerupGuideController : MonoBehaviour {
     public UITexture texture;
     public DrillSelector drill_selector;
 
+    public UILabel target_level_text;
+
     int limited_drill_index; 
 
     public void Show(int current_level)
@@ -28,13 +30,17 @@ public class CheerupGuideController : MonoBehaviour {
         {
             return;
         }
-        
+
+        /*
         texture.mainTexture = drill_selector.texture_table[limited_drill_index];
         guide_text.text = Localization.Get("Cheer up");
 
         guide_text.text = guide_text.text.Replace("LEVEL %%%", "[373449]LEVEL " + next_target_level.ToString() + "[-]");
+        */
 
-        
+        target_level_text.text = next_target_level.ToString();
+
+
         gameObject.SetActive(true);
     }
 

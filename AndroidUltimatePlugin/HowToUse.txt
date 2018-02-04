@@ -2,6 +2,10 @@
                                                 How to use
 ================================================================================================================================
 
+Note:
+minSdkVersion 9
+targetSdkVersion 16
+
 1. Download the plugin from unity3d asset store 
 https://www.assetstore.unity3d.com/en/#!/search/page=1/sortby=popularity/query=publisher:13227
 

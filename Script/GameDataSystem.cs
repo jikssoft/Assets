@@ -208,7 +208,7 @@ public class GameDataSystem : MonoBehaviour {
     public void SetLastRewardADTime(System.DateTime last_time)
     {
         last_reward_ad_time = last_time;
-        Save();
+        Save(false);
     }
 
     public System.DateTime GetLastRewardADTime()
@@ -228,7 +228,7 @@ public class GameDataSystem : MonoBehaviour {
         {
             reward_waiting_time = 10;
         }
-        Save();
+        Save(false);
     }
 
     public void ResetRewardADWatingTime()
@@ -410,13 +410,15 @@ public class GameDataSystem : MonoBehaviour {
         
         Debug.Log("google play service connect");
 
-        
+        GooglePlayConnection.ActionPlayerConnected -= OnPlayerConnected;
+
         GooglePlaySavedGamesManager.ActionAvailableGameSavesLoaded += Android_ActionAvailableGameSavesLoaded;
         GooglePlaySavedGamesManager.Instance.LoadAvailableSavedGames();
     }
 
     private void OnConnectionResult(GooglePlayConnectionResult result)
     {
+        GooglePlayConnection.ActionConnectionResultReceived -= OnConnectionResult;
         Debug.Log(result.code.ToString());
     }
 

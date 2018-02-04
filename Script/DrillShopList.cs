@@ -58,6 +58,8 @@ public class DrillShopList : MonoBehaviour, ReturnKeyProcess, Rewardable {
             {
                 collect_drill_button.spriteName = "btn_tool_shop_new";
             }
+
+            collect_drill_button.GetComponent<UIPlayTween>().enabled = true;
         }
 
 

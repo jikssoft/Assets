@@ -11,10 +11,11 @@ public class VibratorController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         instance = this;
+        /*
         vibratorPlugin = VibratorPlugin.GetInstance();
         vibratorPlugin.SetDebug(0);
         vibratorPlugin.Init();
-
+        */
     }
 	
 	// Update is called once per frame
@@ -37,9 +38,11 @@ public class VibratorController : MonoBehaviour {
 
 		if (RuntimePlatform.Android == Application.platform) {
 			if (!instance.isVibrate) {
-				instance.vibratorPlugin.Vibrate (10000);
-				instance.isVibrate = true;
-			}
+				//instance.vibratorPlugin.Vibrate (10000);
+				//instance.isVibrate = true;
+                instance.StartCoroutine(instance.OtherPlatformLoopingVibrate());
+                instance.isVibrate = true;
+            }
 		} else {
 			if (!instance.isVibrate) {
 				instance.StartCoroutine (instance.OtherPlatformLoopingVibrate ());
@@ -55,7 +58,7 @@ public class VibratorController : MonoBehaviour {
 
 		if (RuntimePlatform.Android == Application.platform) {
 			if (instance.isVibrate) {
-				instance.vibratorPlugin.StopVibrate ();
+				//instance.vibratorPlugin.StopVibrate ();
 				instance.isVibrate = false;
 			}
 		} else {
