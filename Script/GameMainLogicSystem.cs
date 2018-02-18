@@ -5,6 +5,31 @@ using SA.Analytics.Google;
 
 public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 {
+    public interface GameMode
+    {
+        void TapUp();
+        void TapDown();
+        IEnumerator StartGame(float first_time, float second_time, float third_time);
+        IEnumerator ReStartGame(float first_time, float second_time, float third_time);
+        IEnumerator ChangeBox();
+        void UpdateGUI();
+        bool CheckContinuePopup(int continue_count);
+        void ProcessClearGamePoint();
+        void UpdateFailGUI();
+        void UpdateClearGUI();
+        void ProcessClearReward();
+        void UpdatePreFailClearGUI(float time);
+        void Continue();
+        void SetLevel(int level);
+        int GetAdvancedDiturbTriggerValue();
+        bool CheckInterstitialAD();
+        void NextNail();
+        bool CheckClearGame();
+        void TimeGaugeOver();
+        void CrashBox();
+        void NextStage();
+    }
+
 
     public ArrayList nail_table;
     public Drill drill;
@@ -14,14 +39,16 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public CameraTweener camera_tweener;
 
     public UIPlayTween play_stage_ani_text;
-    int nail_index;
-    int current_level;
-    int current_coin;
+    public int nail_index;
+    
+    public int current_coin;
 
     public float drill_speed;
     float drill_operate_speed;
     // Use this for initialization
 
+    public LevelGameMode level_game_mode;
+    GameMode current_game_mode;
 
     void Start () {
         
@@ -30,11 +57,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         drill_operate_speed = drill_speed;
 
         GameDataSystem dataSystem = GetComponent<GameDataSystem>();
-        current_level = dataSystem.GetLevel();
         current_coin = dataSystem.GetCoin();
-
-        SetLevelGUI();
-
+        
         ReturnKeyManager.RegisterReturnKeyProcess(this);
 
         //Screen.SetResolution(720, 1280, true);
@@ -43,16 +67,18 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         camera_size = camera_tweener.GetComponent<Camera>().orthographicSize;
 
+        current_game_mode = level_game_mode;
+
     }
 
     public TweenAlpha red_twinkle;
+    
 
     // Update is called once per frame
     void Update()
     {
         if(drill_time_gause != null && drill_time_gause.GetRemainGauseTime() < 0f)
-        {
-            count_clear_nail--;
+        {   
             Manager.Client.SendEventHit("GameSequence", "gameover timeover", current_nail.disturb_type.ToString());
             FailRestartGame();
             drill.Stop();
@@ -65,12 +91,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
             VibratorController.StopVibrate();
             StopDisturb();
         }
-    }
-
-    void SetLevelGUI()
-    {
-        
-        level_text.text = string.Format("LEVEL {0}", current_level);
     }
 
     bool time_gause_reset;
@@ -101,20 +121,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     int continue_count = 0;
     bool CheckContinuePopup()
     {
-        bool retval = false;
-
-		if(current_level > 10 && continue_count == 0)// && retry_count >= 5)
-        {
-            if(((float)(2f * current_level) / 3f) > (float)count_clear_nail)
-            {
-				if (UnityEngine.Random.Range (0, 1f) > 0.2f) 
-				{
-					retval = true;
-				}
-            }
-        }
-
-        return retval;
+        return  current_game_mode.CheckContinuePopup(continue_count);
     }
 
     IEnumerator ShowContinueADPopup()
@@ -146,7 +153,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     IEnumerator FailState()
     {
-        ResetBoxAndDrill();
+        MoveBoxAndDrill();
 
         yield return new WaitForSeconds(0.3f);
 
@@ -161,8 +168,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         ActiveAnimation.Play(game_ui_animation, "ShowInGameMenu", AnimationOrTween.Direction.Forward);
 
-        star_point_controller.gameObject.SetActive(true);
-        star_point_controller.StartStarEffect(0);
+        current_game_mode.UpdateFailGUI();
 
         yield return new WaitForSeconds(0.5f);
         
@@ -171,8 +177,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public void RetryLevel()
     {
         retry_count++;
-
-        count_clear_nail = current_level;
+        //r count_clear_nail = current_level;
         nail_point = 0;
         ChangeDrill();
     }
@@ -185,21 +190,16 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     {
         input_system.SetActive(false);
         drill.StopDrillIdleSound();
-        GameDataSystem dataSystem = GetComponent<GameDataSystem>();
-        clear_count_text.text = count_clear_nail.ToString();
-        dataSystem.SetLevel(current_level+1);
-
         retry_count = 0;
 
-        int point = Mathf.RoundToInt((float)nail_point / (float)current_level);
-        GetComponent<GameDataSystem>().SetStartPoint(current_level, point);
+        current_game_mode.ProcessClearGamePoint();
 
         drill_time_gause.StopGauseTime();
         
         StartCoroutine(ClearLevelState());
     }
 
-    public StarPointController star_point_controller;
+    
     public Animation game_ui_animation;
     public BottomLayerController bottom_game_menu_controller;
     public GameObject drill_clear_point;
@@ -207,23 +207,18 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     IEnumerator ClearLevelState()
     {
         yield return new WaitForSeconds(1f);
-        ResetBoxAndDrill();
+        MoveBoxAndDrill();
 
         //clear_level_text.gameObject.SetActive(true);
         //clear_level_text.Play(true);
 
         yield return new WaitForSeconds(0.3f);
-        
-        int point = Mathf.RoundToInt((float)nail_point / (float)current_level);
-        star_point_controller.gameObject.SetActive(true);
-        star_point_controller.StartStarEffect(point);
+
+        current_game_mode.UpdateClearGUI();
         
         yield return new WaitForSeconds(0.3f);
 
-        GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-        LimitedDrillManager manager = selector.GetComponent<LimitedDrillManager>();
-
-        manager.GetLimitedDrillForLevel(current_level);
+        current_game_mode.ProcessClearReward();
 
         drill.StopDrillIdleSound();
         bottom_game_menu_controller.SetClearState();
@@ -234,7 +229,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         ActiveAnimation.Play(game_ui_animation, "ShowInGameMenu", AnimationOrTween.Direction.Forward);
     }
 
-    void ResetBoxAndDrill()
+    void MoveBoxAndDrill()
     {
         float time = 0.3f;
         iTween.ScaleTo(box.gameObject, iTween.Hash("scale", new Vector3(0.7f, 0.7f, 0.7f), "time", time, "easetype", iTween.EaseType.linear));
@@ -242,14 +237,12 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         box.Reset(2f);
         drill_time_gause.DisableGauseTime();
 
-        iTween.FadeTo(clear_count_text.gameObject, 0f, time);
+        current_game_mode.UpdatePreFailClearGUI(time);
     }
 
-    public void UpateLevelText()
+    public void UpateGUI()
     {
-        SetLevelGUI();
-        count_clear_nail = current_level;
-        clear_count_text.text = count_clear_nail.ToString();
+        current_game_mode.UpdateGUI();
     }
 
     bool gameover_flag = false;
@@ -276,7 +269,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     IEnumerator CrashBox()
     {
         Debug.Log("CrashBox~~~~~~~~~~~~~~~~~~~~");
-        count_clear_nail--;
         box.Crash(drill);
         drill.Stop();
         box.Stop();
@@ -299,81 +291,63 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     public DrillTimeGause drill_time_gause;
     public float time_gause = 5f;
-    int count_clear_nail = 0;
-    int nail_point = 0;
+    public int nail_point = 0;
     public Animation guide_panel;
 
     public void StartLastLevel()
     {
-        current_level = current_level + 1;// dataSystem.GetLevel();
+        current_game_mode.NextStage();
+        
         retry_count = 0;
         nail_point = 0;
 
-        UpateLevelText();
+        current_game_mode.UpdateGUI(); 
 
         ChangeDrill();
     }
 
+    public bool build_nail_table;
     public IEnumerator StartGame()
     {
         tap_process = false;
         iTween.MoveTo(box.gameObject, new Vector3(0f, 0f, 0f), 1f);
-        GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-        selector.GetComponent<DrillSelector>().ChangeDrill();
 
+        build_nail_table = false;
+        StartCoroutine(current_game_mode.StartGame(1f, 0.3f, 0.5f));
+        
         yield return new WaitForSeconds(1f);
 
         //play_stage_ani_text.Play(true);
-
         //yield return new WaitForSeconds(2f);
-
-        nail_table = new ArrayList();
         
-        count_clear_nail = current_level;
-        builder.BuildNail(nail_table, count_clear_nail, current_level, box.box_type);
-        nail_index = 0;
-
-        clear_count_text.text = count_clear_nail.ToString();
-
+        yield return new WaitUntil(() => build_nail_table == true);        
 
         current_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
-        
         box.TurnBox(current_nail);
-
         coin_text.text = current_coin.ToString();
-
         iTween.MoveTo(box.gameObject, iTween.Hash("position", new Vector3(0f, -3f, 0f), "time", 0.3f, "islocal", true));
         SetDrillPositionToCurrentNail();
+
         yield return new WaitForSeconds(0.3f);
         
         tap_process = true;
         input_system.SetActive(true);
         drill.PlayDrillIdleSound();
         SoundManager.PlayBGM();
-
-        cheerup_guide_controller.Show(current_level);
-
+        
         guide_panel.GetComponent<TweenAlpha>().Play(true);
         yield return new WaitForSeconds(0.5f);
         guide_panel.GetComponent<Animation>().Play();
 
         continue_count = 0;
-
-        FastGuidePopup();
-
-        if (current_level != 1 && current_coin > 0)
-        {
-            BannerController.ShowBanner();
-        }
     }
 
-    void ResetBeforeGame()
+    void DrillBoxMenuReset()
     {
         drill_time_gause.EnableGauseTime();
         drill.ResetScale();
         box.Reset(3f);
-        iTween.FadeTo(clear_count_text.gameObject, 1f, 0.1f);
-
+        
         foreach (GameObject nail in nail_table)
         {
             Destroy(nail.transform.parent.gameObject);
@@ -401,10 +375,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
             shutter_controller.ShutDown();
             yield return new WaitForSeconds(0.5f);
 
-            ResetBeforeGame();
+            DrillBoxMenuReset();
 
             yield return new WaitForSeconds(0.2f);
-            UpateLevelText();
+            current_game_mode.UpdateGUI();
         }
         else
         {
@@ -427,12 +401,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         //yield return new WaitForSeconds(0.3f);
 
-        star_point_controller.ArrageStar();
-        
+        build_nail_table = false;
+        StartCoroutine(current_game_mode.ChangeBox());
 
-        nail_table.Clear();
-        builder.BuildNail(nail_table, count_clear_nail, current_level, box.box_type);
-        nail_index = 0;
+        yield return new WaitUntil(() => build_nail_table == true);
 
         current_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
         box.TurnBox(current_nail);
@@ -446,13 +418,9 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
             continue_count = 0;
             SetDrillPositionToCurrentNail();
         }
-
-        clear_count_text.text = count_clear_nail.ToString();
-
         
         //iTween.MoveTo(box.gameObject, iTween.Hash("position", new Vector3(0f, -3f, 0f), "time", 0.3f, "islocal", true));
         
-
         if (withShutter == true)
         {
             shutter_controller.ShutUp();
@@ -469,7 +437,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         //cheerup_guide_controller.Show(current_level);
 
         drill_time_gause.SetGauseTime(time_gause);
-
         
     }
 
@@ -497,7 +464,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         }
     }
 
-    bool first_nail = true;
+    public bool first_nail = true;
 
     public void SetStartState()
     {
@@ -531,12 +498,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     public void Continue()
     {
-		count_clear_nail++;
-        Manager.Client.SendEventHit("GameSequence", "Continue", current_level.ToString() + "_" + count_clear_nail.ToString());
+        current_game_mode.Continue();
         ActiveAnimation.Play(game_ui_animation, "HideInGameMenu", AnimationOrTween.Direction.Forward);
-        star_point_controller.ArrageStar();
         //NextNail();
-		ContinueNail ();
+        ContinueNail ();
         retry_count = 0;
         continue_count++;
         input_system.SetActive(true);
@@ -546,8 +511,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     public void TapDown()
     {
-        
-
         Debug.Log("------------------" + box.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime);
         if(box.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).tagHash != 0)
         {
@@ -561,6 +524,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         VibratorController.Vibrate();
 
+        current_game_mode.TapDown();
+
         if (first_nail == true)
         {
             ActiveAnimation.Play(game_ui_animation, "HideInGameMenu", AnimationOrTween.Direction.Forward);
@@ -569,7 +534,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
             guide_panel.GetComponent<TweenAlpha>().Play(false);
             guide_panel.GetComponent<Animation>().Stop();
 
-            cheerup_guide_controller.Hide();
+            
             first_nail = false;
         }
         StartDisturb();
@@ -605,7 +570,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         }
         else if (current_nail.disturb_type == Nail.DISTURB_TYPE.ZOOM_OUT)
         {
-            if (current_level >= 20)
+            if (current_game_mode.GetAdvancedDiturbTriggerValue() >= 20)
             {
                 int rand = UnityEngine.Random.Range(0, 2);
                 float rotate_speed = rand == 1 ? rotate_angle : -rotate_angle;
@@ -619,7 +584,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         }
         else if (current_nail.disturb_type == Nail.DISTURB_TYPE.ZOOM_IN)
         {
-            if (current_level >= 20)
+            if (current_game_mode.GetAdvancedDiturbTriggerValue() >= 20)
             {
                 int rand = UnityEngine.Random.Range(0, 2);
                 float rotate_speed = rand == 1 ? rotate_angle : -rotate_angle;
@@ -633,7 +598,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         }
         else if (current_nail.disturb_type == Nail.DISTURB_TYPE.ROTATE)
         {
-            if (current_level >= 20)
+            if (current_game_mode.GetAdvancedDiturbTriggerValue() >= 20)
             {
                 int rand = UnityEngine.Random.Range(0, 2);
                 float rotate_speed = rand == 1 ? rotate_angle : -rotate_angle;
@@ -656,11 +621,9 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     void StartPreDisturb()
     {
-        
-
         if (current_nail.disturb_type == Nail.DISTURB_TYPE.PRE_ZOOM_OUT)
         {
-            if (current_level >= 20)
+            if (current_game_mode.GetAdvancedDiturbTriggerValue() >= 20)
             {
                 int rand = UnityEngine.Random.Range(0, 2);
                 float rotate_speed = rand == 1 ? rotate_angle : -rotate_angle;
@@ -674,7 +637,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         }
         else if (current_nail.disturb_type == Nail.DISTURB_TYPE.PRE_ZOOM_IN)
         {
-            if (current_level >= 20)
+            if (current_game_mode.GetAdvancedDiturbTriggerValue() >= 20)
             {
                 int rand = UnityEngine.Random.Range(0, 2);
                 float rotate_speed = rand == 1 ? rotate_angle : -rotate_angle;
@@ -730,10 +693,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public UIPlayTween play_good_text_ani;
     public UIPlayTween play_perfect_text_ani;
     public UIPlayTween play_amazing_text_ani;
-    public TextMesh clear_count_text;
+    
     
     public UILabel speed_value;
-    public TextMesh level_text;
+    
     public void ChangeSliderValue(UISlider slider)
     {
         float value = slider.value * 2f;
@@ -743,9 +706,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     public void SetLevel(int level)
     {
+        current_game_mode.SetLevel(level);
         star_point_popup.Return();
-        current_level = level;
-        count_clear_nail = current_level;
         retry_count = 0;
         nail_point = 0;
         ChangeDrill();
@@ -761,13 +723,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     public void ChangeDrill()
     {
-        StartCoroutine(ChangeDrillSequence());
+        StartCoroutine(ReStartGame());
     }
-
-    public GameObject fast_nail_guide_popup;
-    public CheerupGuideController cheerup_guide_controller;
-
-    IEnumerator ChangeDrillSequence()
+    
+    IEnumerator ReStartGame()
     {
         if (tap_process == false)
         {
@@ -777,45 +736,29 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         first_nail = true;
 
-        cheerup_guide_controller.Hide();
-
+        build_nail_table = false;
+        StartCoroutine(current_game_mode.ReStartGame(0.7f, 0.3f, 0.5f));
+        
         drill_time_gause.StopGauseTime();
 
         shutter_controller.ShutDown();
         yield return new WaitForSeconds(0.5f);
 
-        ResetBeforeGame();
+        DrillBoxMenuReset();
         yield return new WaitForSeconds(0.2f);
-
-        UpateLevelText();
-
-        Destroy(drill.gameObject);
-        Destroy(box.box_anchor.transform.parent.gameObject);
-        GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-        selector.GetComponent<DrillSelector>().ChangeDrill();
-
+      
 		ActiveAnimation.Play(game_ui_animation, "StartInGameMenu", AnimationOrTween.Direction.Forward);
-
-        GameDataSystem dataSystem = GetComponent<GameDataSystem>();
-        current_coin = dataSystem.GetCoin();
-        coin_text.text = current_coin.ToString();
 
         //yield return new WaitForSeconds(0.2f);        
 
         //iTween.MoveTo(box.gameObject, new Vector3(0f, 0f, 0f), 0.2f);
 
+        yield return new WaitUntil(() => build_nail_table == true);
+
         box.ResetRotateBox();
 
         //yield return new WaitForSeconds(0.3f);
-
-        star_point_controller.ArrageStar();
-
-        nail_table.Clear();
-        builder.BuildNail(nail_table, count_clear_nail, current_level, box.box_type);
-        nail_index = 0;
-
-        clear_count_text.text = count_clear_nail.ToString();
-
+        
         current_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
         box.TurnBox(current_nail);
 
@@ -826,24 +769,18 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         shutter_controller.ShutUp();
 
+        GameDataSystem dataSystem = GetComponent<GameDataSystem>();
+        current_coin = dataSystem.GetCoin();
+        coin_text.text = current_coin.ToString();
+
         yield return new WaitForSeconds(0.3f);
         tap_process = true;
         input_system.SetActive(true);
         drill.PlayDrillIdleSound();
 
-        cheerup_guide_controller.Show(current_level);
-
         guide_panel.GetComponent<TweenAlpha>().Play(true);
         yield return new WaitForSeconds(0.5f);
         guide_panel.GetComponent<Animation>().Play();
-
-        
-
-
-        
-
-        FastGuidePopup();
-
         continue_count = 0;
     }
     
@@ -861,8 +798,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         box.Stop();
         current_nail.Stop();
 
-        count_clear_nail--;
-        
+        current_game_mode.TapUp();
+                
         int point = 0;
         if (current_nail.collision_state == Nail.NAIL_STATE.GOOD)
         {
@@ -890,10 +827,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         current_nail.Clear(this);
 
-        Debug.Log("clear_nail count " + count_clear_nail.ToString());
         if (CheckGameOver() == true || CheckClearLevel() == true)
         {
-            
             return;
         }
 
@@ -902,27 +837,22 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     void CheckInterstisialAd()
     {
-        if (current_level >= 5 )
+        
+        if (interstisialAD_count == 4)
         {
-            if (interstisialAD_count == 4)
-            {
-                InterstitialController.RequestInterstitialAd();
-            }
-
-            if( interstisialAD_count >= 6)
-            {
-                GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-                LimitedDrillManager manager = selector.GetComponent<LimitedDrillManager>();
-
-                if(manager.CheckLimitedDrillForLevel(current_level) < 0
-                    && count_clear_nail > 0)
-                {
-                    InterstitialController.ShowInterstisialsAD();
-                    interstisialAD_count = 0;
-                }
-                
-            }
+            InterstitialController.RequestInterstitialAd();
         }
+
+        if( interstisialAD_count >= 6)
+        {
+            if(current_game_mode.CheckInterstitialAD() == true)
+            {
+                InterstitialController.ShowInterstisialsAD();
+                interstisialAD_count = 0;
+            }
+                
+        }
+
     }
 
 	void ContinueNail()
@@ -934,8 +864,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     void NextNail()
     {
-        clear_count_text.text = count_clear_nail.ToString();
-
+        current_game_mode.NextNail();
+        
         nail_index++;
 
         if (nail_index >= nail_table.Count)
@@ -972,7 +902,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     bool CheckClearLevel()
     {
-        if(count_clear_nail == 0)
+        if(current_game_mode.CheckClearGame() == true)
         {
             ClearLevel();
             
@@ -1033,35 +963,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         drill_time_gause.PauseGauseTime();
     }
 
-    bool first_run_level_13 = true;
-    public void FastGuidePopup()
-    {
-        if(first_run_level_13 == false)
-        {
-            return;
-        }
-
-        if(current_level < 13 || current_level > 15)
-        {
-            return;
-        }
-
-        GameDataSystem dataSystem = GetComponent<GameDataSystem>();
-        if (dataSystem.GetCheckFastNail() == true)
-        {
-            return;
-        }
-
-        first_run_level_13 = false;
-
-        fast_nail_guide_popup.gameObject.SetActive(true);
-        fast_nail_guide_popup.GetComponent<BlurController>().Blur();
-
-        ActiveAnimation.Play(fast_nail_guide_popup.GetComponent<Animation>(), "ShowFailPopup", AnimationOrTween.Direction.Forward);
-        ReturnKeyManager.RegisterReturnKeyProcess(fast_nail_guide_popup.GetComponent<ReturnKeyProcess>());
-
-        dataSystem.SetCheckFastNail();
-    }
+    
 
     
 }
