@@ -4,9 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
-    
-
+public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
+{
     GameDataSystem dataSystem;
     GameMainLogicSystem system;
 
@@ -14,17 +13,19 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     public CheerupGuideController cheerup_guide_controller;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         GameObject system_obj = GameObject.FindGameObjectWithTag("System");
         system = system_obj.GetComponent<GameMainLogicSystem>();
         dataSystem = system_obj.GetComponent<GameDataSystem>();
         current_level = dataSystem.GetLevel();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 
     public TextMesh level_text;
     public TextMesh clear_count_text;
@@ -32,7 +33,7 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
 
     public int current_level;
     public int count_clear_nail = 0;
-    
+
     public bool CheckContinuePopup(int continue_count)
     {
         bool retval = false;
@@ -63,20 +64,20 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     public IEnumerator StartGame(float first_time, float second_time, float third_time)
     {
         GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-        selector.GetComponent<DrillSelector>().ChangeDrill();
+        selector.GetComponent<DrillSelector>().ChangeDrillInfiniteMode();
 
         yield return new WaitForSeconds(first_time);
 
         system.nail_table = new ArrayList();
 
         count_clear_nail = current_level;
-        system.builder.BuildNail(system.nail_table, count_clear_nail, current_level, system.box.box_type);
+        system.builder.BuildNailInfinityMode(system.nail_table, count_clear_nail, current_level, system.box);
         system.nail_index = 0;
 
         clear_count_text.text = count_clear_nail.ToString();
 
         system.build_nail_table = true;
-        
+
 
         yield return new WaitForSeconds(second_time);
 
@@ -177,7 +178,7 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     public IEnumerator CreateGame(float first_time, float second_time, float third_time)
     {
         throw new NotImplementedException();
-    }   
+    }
 
     public void TapDown()
     {
@@ -191,7 +192,7 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     {
         count_clear_nail--;
     }
-    
+
     public void ProcessClearGamePoint()
     {
         clear_count_text.text = count_clear_nail.ToString();
@@ -231,7 +232,7 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     {
         count_clear_nail++;
         Manager.Client.SendEventHit("GameSequence", "Continue", current_level.ToString() + "_" + count_clear_nail.ToString());
-        
+
         star_point_controller.ArrageStar();
     }
 

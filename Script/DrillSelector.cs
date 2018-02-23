@@ -69,7 +69,7 @@ public class DrillSelector : MonoBehaviour {
         system.drill_time_gause = drill.GetComponentInChildren<DrillTimeGause>();
 
         GameObject box = Instantiate(box_table[select_index]);
-        system.box.box_anchor = box.GetComponentInChildren<BoxAnchor>().gameObject;
+        system.box.AddBox(box);
         box.transform.parent = box_parent.transform;
         box.transform.rotation = new Quaternion(0f,0f,0f,0f);
         box.transform.localPosition = new Vector3(0f, 0f, 0f);
@@ -77,9 +77,75 @@ public class DrillSelector : MonoBehaviour {
 
         system.box.box_type = system.drill.box_type;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    public void ChangeDrillInfiniteMode()
+    {
+        GameObject gameSystem = GameObject.FindGameObjectWithTag("System");
+        GameMainLogicSystem system = gameSystem.GetComponent<GameMainLogicSystem>();
+        GameDataSystem data_system = gameSystem.GetComponent<GameDataSystem>();
+        select_index = data_system.GetLastDrill();
+
+        if (select_index == -1)
+        {
+            ArrayList collected_drill_table = new ArrayList();
+            for (int i = 0; i < drill_table.Length; i++)
+            {
+                if (data_system.IsCollectDrill(i))
+                {
+                    collected_drill_table.Add(i);
+                }
+            }
+
+            int random_index = Random.Range(0, collected_drill_table.Count);
+            Debug.Log("------------ random:" + drill_table.Length + " " + random_index);
+            select_index = (int)(collected_drill_table[random_index]);
+        }
+
+        if (get_limeted_drill_index > 0)
+        {
+            select_index = get_limeted_drill_index;
+            if (data_system.GetLastDrill() != -1)
+            {
+                data_system.SelectDrill(get_limeted_drill_index);
+            }
+
+            get_limeted_drill_index = -1;
+        }
+
+        GameObject drill = Instantiate(drill_table[select_index]);
+
+        system.drill = drill.GetComponent<Drill>();
+        system.drill_time_gause = drill.GetComponentInChildren<DrillTimeGause>();
+
+        float distance_box = 0f; ;
+        float scale = 0.7f;
+
+        for (int i = 0; i < 4; i++)
+        {
+            GameObject box = Instantiate(box_table[select_index]);
+            system.box.AddBox(box);
+
+            if (system.drill.box_type == Box.BOX_TYPE.RECTANGLE)
+            {
+                distance_box = box.GetComponentInChildren<BoxCollider2D>().size.x * scale;
+            }
+            else
+            {
+                distance_box = box.GetComponentInChildren<CircleCollider2D>().radius * 2f * scale;
+            }
+
+            box.transform.parent = box_parent.transform;
+            box.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+            box.transform.localPosition = new Vector3((distance_box + 0.5f) * i, 0f, 0f);
+            box.transform.localScale = new Vector3(scale, scale, 1f);
+            box.GetComponentInChildren<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        }
+
+        system.box.box_type = system.drill.box_type;
+    }
+
+    // Update is called once per frame
+    void Update () {
 		
 	}
 }

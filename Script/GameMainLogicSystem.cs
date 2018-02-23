@@ -48,6 +48,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     // Use this for initialization
 
     public LevelGameMode level_game_mode;
+    public InfinityGameMode infinity_game_mode;
     GameMode current_game_mode;
 
     void Start () {
@@ -67,8 +68,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         camera_size = camera_tweener.GetComponent<Camera>().orthographicSize;
 
-        current_game_mode = level_game_mode;
-
+        //current_game_mode = level_game_mode;
+        current_game_mode = infinity_game_mode;
     }
 
     public TweenAlpha red_twinkle;
@@ -793,12 +794,12 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         }
         StopDisturb();
         drill_time_gause.SetGauseTime(time_gause);
-
+        
         drill.Stop();
         box.Stop();
         current_nail.Stop();
 
-        current_game_mode.TapUp();
+        current_game_mode.TapUp();        
                 
         int point = 0;
         if (current_nail.collision_state == Nail.NAIL_STATE.GOOD)

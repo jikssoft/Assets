@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Box : MonoBehaviour {
 
@@ -11,8 +12,9 @@ public class Box : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-	
-	}
+        box_table = new Queue<GameObject>();
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -80,30 +82,47 @@ public class Box : MonoBehaviour {
         transform.localScale = new Vector3(1f, 1f, 1f);
     }
 
-    public GameObject box_anchor;
+    public Queue<GameObject> box_table;
+    GameObject current_box_anchor;
+
+    public void AddBox(GameObject box)
+    {
+        box_table.Enqueue(box);
+        current_box_anchor = box;
+    }
+
+    public GameObject GetCurrentBox()
+    {
+        return current_box_anchor;
+    }
+
     public Vector3 shake_pos;
     public void Operate( )
     {
-        iTween.ShakePosition(box_anchor, iTween.Hash("amount", shake_pos, "time", float.MaxValue, "islocal", true));
-
+        iTween.ShakePosition(current_box_anchor, iTween.Hash("amount", shake_pos, "time", float.MaxValue, "islocal", true));
     }
 
     public void Stop()
     {
-        iTween.Stop(box_anchor);
-        box_anchor.transform.localPosition = new Vector3(0f, 0f, 0f);
+        iTween.Stop(current_box_anchor);
+        current_box_anchor.transform.localPosition = new Vector3(0f, 0f, 0f);
     }
 
     public void RotateBox()
     {
         //iTween.PunchRotation(box_anchor.gameObject, new Vector3(0f, 0f, 180f), 0.5f);
-        iTween.RotateAdd(box_anchor.gameObject, new Vector3(0f, 0f, 360f), 0.4f);
+        iTween.RotateAdd(current_box_anchor.gameObject, new Vector3(0f, 0f, 360f), 0.4f);
+    }
+
+    public void DeleteBox()
+    {
+        Destroy(box_table.Dequeue());
     }
 
     public void ResetRotateBox()
     {
         Animator animator = GetComponent<Animator>();
         animator.speed = 1f;
-        box_anchor.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+        current_box_anchor.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
     }
 }

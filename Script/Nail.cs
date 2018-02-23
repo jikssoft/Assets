@@ -141,8 +141,6 @@ public class Nail : MonoBehaviour {
         //GameObject system = GameObject.FindGameObjectWithTag("System");
         operate_speed = 0f;
         Debug.Log("------------ stop");
-        //gameObject.transform.parent = null;
-        //gameObject.transform.parent = system.GetComponent<GameMainLogicSystem>().box.box_anchor.transform;
     }
 
     public GameObject coin_obj;

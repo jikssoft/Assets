@@ -121,7 +121,7 @@ public class NailBuilder : MonoBehaviour {
         GameObject systemObj = GameObject.FindGameObjectWithTag("System");
         GameMainLogicSystem system = systemObj.GetComponent<GameMainLogicSystem>();
 
-        BoxCollider2D box_collider = system.box.box_anchor.transform.parent.GetComponentInChildren<BoxCollider2D>();
+        BoxCollider2D box_collider = system.box.GetCurrentBox().GetComponentInChildren<BoxCollider2D>();
 
         float adjust_distance_vertical = 0f;
         float adjust_y_vertical = 0f;
@@ -281,6 +281,175 @@ public class NailBuilder : MonoBehaviour {
         if(remainNail / (count * 4) <= 0)
         {
             ArrangeNailByLevel(nail_table, remainNail);
+        }
+    }
+
+    public void BuildNailInfinityMode(ArrayList nail_table, int remainNail, int level, Box box)
+    {
+        Debug.Log("BuildNail level: " + remainNail.ToString());
+        setting_box_type = box.box_type;
+        
+        nail_table.Clear();
+
+        foreach (GameObject box_obj in box.box_table)
+        {
+            if (setting_box_type == Box.BOX_TYPE.RECTANGLE)
+            {
+                BuildNailInfinityModeRectangle(nail_table, box_obj);
+            }
+            else if (setting_box_type == Box.BOX_TYPE.CIRCLE)
+            {
+                BuildNailInfinityModeCircle(nail_table, box_obj);
+            }
+        }
+
+        ArrayList index_table = new ArrayList();
+        for (int i = 1; i < nail_table.Count; i++)
+        {
+            index_table.Add(i);
+        }
+
+        foreach (GameObject nail in nail_table)
+        {
+            nail.GetComponent<Nail>().SaveStartPos();
+        }
+
+        /* Random Index
+        if (remainNail % 4 == 0)
+        {
+            for (int t = 0; t < nail_table.Count; t++)
+            {
+                GameObject tmp = (GameObject)(nail_table[t]);
+                int r = Random.Range(t, nail_table.Count);
+                nail_table[t] = nail_table[r];
+                nail_table[r] = tmp;
+            }
+        }
+        */
+
+        if (level >= 13 && level < 20)
+        {
+            BuildRandomSpeedSlowDisturb(nail_table, index_table);
+            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 1);
+        }
+        else if (level >= 20)
+        {
+            BuildRandomSpeedSlowDisturb(nail_table, index_table);
+            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 2);
+        }
+        //BuildRandomDisturb(nail_table);
+
+        BuildCoinNail(nail_table);
+
+        
+    }
+
+    float infinity_mode_init_x_pos = -2f;
+    public void BuildNailInfinityModeRectangle(ArrayList nail_table, GameObject anchor)
+    {
+        Quaternion rotation = Quaternion.identity;
+
+        GameObject nail_table_obj = GameObject.FindGameObjectWithTag("NailTable");
+
+        GameObject systemObj = GameObject.FindGameObjectWithTag("System");
+        GameMainLogicSystem system = systemObj.GetComponent<GameMainLogicSystem>();
+
+        BoxCollider2D box_collider = system.box.GetCurrentBox().GetComponentInChildren<BoxCollider2D>();
+
+        float adjust_distance_vertical = 0f;
+        float adjust_y_vertical = 0f;
+
+        Vector3 scale = box_collider.transform.parent.localScale;
+        if (box_collider.size.y < unit_y)
+        {
+            //unit_y : min_y = box_collider.size.y : ??
+            float new_min_y = (min_y * box_collider.size.y) / unit_y;
+            adjust_y_vertical = new_min_y - min_y;
+            adjust_y_vertical /= 1.5f;
+
+            //unit_y : init_x_pos = box_collider.size.y : ??
+            float new_distance = (infinity_mode_init_x_pos * box_collider.size.y) / unit_y;
+            adjust_distance_vertical = new_distance - infinity_mode_init_x_pos; 
+        }
+
+        float adjust_distance_horizontal = 0f;
+        float adjust_y_horizontal = 0f;
+
+        if (box_collider.size.x < unit_x)
+        {
+            float new_min_y = (min_y * box_collider.size.x) / unit_x;
+            adjust_y_horizontal = new_min_y - min_y;
+            adjust_y_horizontal /= 1.5f;
+
+            float new_distance = (infinity_mode_init_x_pos * box_collider.size.x) / unit_x;
+            adjust_distance_horizontal = new_distance - infinity_mode_init_x_pos;
+        }
+
+        float distance_horizontal = (4f + (-2f * adjust_distance_horizontal)) / (float)(count - 1);
+
+        Debug.Log("===============anchor " + anchor.transform.position.ToString());
+
+        for (int i = 0; i < count; i++)
+        {
+            GameObject nail_anchor = new GameObject();
+            nail_anchor.transform.position = anchor.transform.position;
+            nail_anchor.transform.parent = nail_table_obj.transform;
+            nail_anchor.transform.Rotate(0f, 0f, 0f);
+            
+            //GameObject nail_new = (GameObject)Instantiate(nail, pos, rotation, nail_anchor.transform);
+            GameObject nail_new = (GameObject)Instantiate(nail, nail_anchor.transform, true);
+
+            Vector3 local_pos = new Vector3();
+            float y_pos = Random.Range(min_y * 0.8f, max_y * 0.8f) + (adjust_y_vertical);
+            local_pos.Set(infinity_mode_init_x_pos + adjust_distance_horizontal + (distance_horizontal * i), y_pos, 10f);
+            local_pos.x *= scale.x;
+
+            nail_new.transform.localPosition = local_pos;
+
+            //nail_new.transform.parent = nail_anchor.transform;
+
+
+            nail_new.GetComponent<Nail>().direction = Nail.DIRECTION.UP;
+            nail_table.Add(nail_new);
+        }
+    }
+
+    public void BuildNailInfinityModeCircle(ArrayList nail_table, GameObject anchor)
+    {
+        Vector3 pos = new Vector3();
+        Quaternion rotation = Quaternion.identity;
+
+        GameObject nail_table_obj = GameObject.FindGameObjectWithTag("NailTable");
+
+        float angle = -30f;
+        float unit_angle = 30f;
+
+        GameObject systemObj = GameObject.FindGameObjectWithTag("System");
+        GameMainLogicSystem system = systemObj.GetComponent<GameMainLogicSystem>();
+        CircleCollider2D box_collider = system.box.GetCurrentBox().GetComponentInChildren<CircleCollider2D>();
+
+
+        Vector3 scale = box_collider.transform.parent.localScale;
+
+        for (int i = 0; i < count; i++)
+        {
+            GameObject nail_anchor = new GameObject();
+            nail_anchor.transform.position = anchor.transform.position;
+            nail_anchor.transform.parent = nail_table_obj.transform;
+            nail_anchor.transform.Rotate(0f, 0f, 0f);
+
+            GameObject nail_new = (GameObject)Instantiate(nail, nail_anchor.transform, true);
+
+            Vector3 local_pos = new Vector3();
+            float y_pos = Random.Range(min_y * 0.8f, max_y * 0.8f);
+            local_pos.Set(0f, y_pos, 10f);
+            nail_new.transform.localPosition = local_pos;
+
+            nail_anchor.transform.Rotate(0f, 0f, angle);
+            angle += unit_angle;
+
+            nail_new.GetComponent<Nail>().direction = Nail.DIRECTION.UP;
+            nail_table.Add(nail_new);
         }
     }
 
@@ -447,7 +616,7 @@ public class NailBuilder : MonoBehaviour {
         GameObject systemObj = GameObject.FindGameObjectWithTag("System");
         GameMainLogicSystem system = systemObj.GetComponent<GameMainLogicSystem>();
 
-        BoxCollider2D box_collider = system.box.box_anchor.transform.parent.GetComponentInChildren<BoxCollider2D>();
+        BoxCollider2D box_collider = system.box.GetCurrentBox().GetComponentInChildren<BoxCollider2D>();
 
         float adjust_distance_vertical = 0f;
         float adjust_y_vertical = 0f;
