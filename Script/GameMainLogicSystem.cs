@@ -11,7 +11,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         void TapDown();
         IEnumerator StartGame(float first_time, float second_time, float third_time);
         IEnumerator ReStartGame(float first_time, float second_time, float third_time);
-        IEnumerator ChangeBox();
+        IEnumerator ChangeBox(bool with_shutter);
         void UpdateGUI();
         bool CheckContinuePopup(int continue_count);
         void ProcessClearGamePoint();
@@ -23,7 +23,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         void SetLevel(int level);
         int GetAdvancedDiturbTriggerValue();
         bool CheckInterstitialAD();
-        void NextNail();
+        bool CheckNextNail();
         bool CheckClearGame();
         void TimeGaugeOver();
         void CrashBox();
@@ -343,7 +343,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         continue_count = 0;
     }
 
-    void DrillBoxMenuReset()
+    public void DrillBoxMenuReset()
     {
         drill_time_gause.EnableGauseTime();
         drill.ResetScale();
@@ -367,43 +367,9 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
             yield break;
         }
         tap_process = false;
-
-        first_nail = true;
-        drill_time_gause.StopGauseTime();
-        
-        if (withShutter == true)
-        {
-            shutter_controller.ShutDown();
-            yield return new WaitForSeconds(0.5f);
-
-            DrillBoxMenuReset();
-
-            yield return new WaitForSeconds(0.2f);
-            current_game_mode.UpdateGUI();
-        }
-        else
-        {
-            box.Reset(1f);
-            foreach (GameObject nail in nail_table)
-            {
-                Destroy(nail.transform.parent.gameObject);
-            }
-
-            yield return new WaitForSeconds(0.3f);
-
-            box.RotateBox();
-            yield return new WaitForSeconds(0.5f);
-        }
-        
-        //iTween.MoveTo(box.gameObject, new Vector3(0f, 0f, 0f), 0.2f);
-
-        box.ResetRotateBox();
-
-
-        //yield return new WaitForSeconds(0.3f);
-
         build_nail_table = false;
-        StartCoroutine(current_game_mode.ChangeBox());
+
+        StartCoroutine(current_game_mode.ChangeBox(withShutter));
 
         yield return new WaitUntil(() => build_nail_table == true);
 
@@ -865,25 +831,28 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     void NextNail()
     {
-        current_game_mode.NextNail();
-        
         nail_index++;
 
-        if (nail_index >= nail_table.Count)
+        if(current_game_mode.CheckNextNail() == true)
         {
             StartCoroutine(ChangeBox(false));
         }
         else
         {
-            Nail new_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
-            if (current_nail.direction != new_nail.direction)
-            {
-                box.TurnBox(new_nail);
-            }
-
-            current_nail = new_nail;
-            SetDrillPositionToCurrentNail();
+            SetNextNail();
         }
+    }
+
+    public void SetNextNail()
+    {
+        Nail new_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
+        if (current_nail.direction != new_nail.direction)
+        {
+            box.TurnBox(new_nail);
+        }
+
+        current_nail = new_nail;
+        SetDrillPositionToCurrentNail();
     }
 
     IEnumerator ClearStage()

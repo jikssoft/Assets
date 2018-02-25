@@ -18,7 +18,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         GameObject system_obj = GameObject.FindGameObjectWithTag("System");
         system = system_obj.GetComponent<GameMainLogicSystem>();
         dataSystem = system_obj.GetComponent<GameDataSystem>();
-        current_level = dataSystem.GetLevel();
+
     }
 
     // Update is called once per frame
@@ -27,20 +27,18 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     }
 
-    public TextMesh level_text;
     public TextMesh clear_count_text;
     public StarPointController star_point_controller;
 
-    public int current_level;
     public int count_clear_nail = 0;
 
     public bool CheckContinuePopup(int continue_count)
     {
         bool retval = false;
 
-        if (current_level > 10 && continue_count == 0)// && retry_count >= 5)
+        if (count_clear_nail > 30 && continue_count == 0)// && retry_count >= 5)
         {
-            if (((float)(2f * current_level) / 3f) > (float)count_clear_nail)
+            if (((float)(2f * count_clear_nail) / 3f) > (float)count_clear_nail)
             {
                 if (UnityEngine.Random.Range(0, 1f) > 0.2f)
                 {
@@ -56,8 +54,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
     {
         iTween.FadeTo(clear_count_text.gameObject, 1f, 0.1f);
 
-        count_clear_nail = current_level;
-        level_text.text = string.Format("LEVEL {0}", current_level);
+        count_clear_nail = 0;
         clear_count_text.text = count_clear_nail.ToString();
     }
 
@@ -65,14 +62,16 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
     {
         GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
         selector.GetComponent<DrillSelector>().ChangeDrillInfiniteMode();
+        system.box.AdjustInfinityModeBoxPositionForMultiResolution();
 
         yield return new WaitForSeconds(first_time);
 
         system.nail_table = new ArrayList();
 
-        count_clear_nail = current_level;
-        system.builder.BuildNailInfinityMode(system.nail_table, count_clear_nail, current_level, system.box);
+        count_clear_nail = 0;
+        system.builder.BuildNailInfinityMode(system.nail_table, count_clear_nail, system.box);
         system.nail_index = 0;
+        unit_clear_count_nail = 0;
 
         clear_count_text.text = count_clear_nail.ToString();
 
@@ -81,18 +80,15 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(second_time);
 
-        cheerup_guide_controller.Show(current_level);
+
 
         yield return new WaitForSeconds(third_time);
 
         FastGuidePopup();
 
-        if (current_level != 1 && system.current_coin > 0)
-        {
-            BannerController.ShowBanner();
-        }
     }
 
+ 
     public IEnumerator ReStartGame(float first_time, float second_time, float third_time)
     {
         cheerup_guide_controller.Hide();
@@ -109,34 +105,51 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         star_point_controller.ArrageStar();
 
         system.nail_table.Clear();
-        system.builder.BuildNail(system.nail_table, count_clear_nail, current_level, system.box.box_type);
+        //system.builder.BuildNail(system.nail_table, count_clear_nail, system.box.box_type);
         system.nail_index = 0;
+        unit_clear_count_nail = 0;
 
         clear_count_text.text = count_clear_nail.ToString();
 
         system.build_nail_table = true;
 
         yield return new WaitForSeconds(second_time);
-
-        cheerup_guide_controller.Show(current_level);
+        
 
         yield return new WaitForSeconds(third_time);
 
         FastGuidePopup();
 
-        if (current_level != 1 && system.current_coin > 0)
-        {
-            BannerController.ShowBanner();
-        }
     }
 
-    public IEnumerator ChangeBox()
+    public IEnumerator ChangeBox(bool withShutter)
     {
+        system.first_nail = true;
+        system.drill_time_gause.StopGauseTime();
+
+        system.box.ScrollBox();
+        system.builder.ScrollNails(system.nail_table, -system.box.GetDistanceBox(), 0.2f);
+        yield return new WaitForSeconds(0.2f);
+
+        int re_position_start_nail_index = system.nail_index - unit_max_count_nail;
+        if(re_position_start_nail_index < 0)
+        {
+            re_position_start_nail_index = system.nail_table.Count - unit_max_count_nail;
+        }
+
+        system.box.SetFrontBoxToLast();
+        system.builder.SetRePositionNail(system.nail_table,
+                re_position_start_nail_index,
+                system.box.GetLastBox());
+        
         star_point_controller.ArrageStar();
 
-        system.nail_table.Clear();
-        system.builder.BuildNail(system.nail_table, count_clear_nail, current_level, system.box.box_type);
-        system.nail_index = 0;
+        if(system.nail_index >= system.nail_table.Count)
+        {
+            system.nail_index = 0;
+        }
+
+        system.SetNextNail();
 
         clear_count_text.text = count_clear_nail.ToString();
 
@@ -144,34 +157,10 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return null;
     }
-
-    bool first_run_level_13 = true;
+    
     public void FastGuidePopup()
     {
-        if (first_run_level_13 == false)
-        {
-            return;
-        }
-
-        if (current_level < 13 || current_level > 15)
-        {
-            return;
-        }
-
-        if (dataSystem.GetCheckFastNail() == true)
-        {
-            return;
-        }
-
-        first_run_level_13 = false;
-
-        fast_nail_guide_popup.gameObject.SetActive(true);
-        fast_nail_guide_popup.GetComponent<BlurController>().Blur();
-
-        ActiveAnimation.Play(fast_nail_guide_popup.GetComponent<Animation>(), "ShowFailPopup", AnimationOrTween.Direction.Forward);
-        ReturnKeyManager.RegisterReturnKeyProcess(fast_nail_guide_popup.GetComponent<ReturnKeyProcess>());
-
-        dataSystem.SetCheckFastNail();
+        
     }
 
 
@@ -190,16 +179,12 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public void TapUp()
     {
-        count_clear_nail--;
+        count_clear_nail++;
     }
 
     public void ProcessClearGamePoint()
     {
-        clear_count_text.text = count_clear_nail.ToString();
-        dataSystem.SetLevel(current_level + 1);
-
-        int point = Mathf.RoundToInt((float)system.nail_point / (float)current_level);
-        dataSystem.SetStartPoint(current_level, point);
+        //To do save best point
     }
 
     public void UpdateFailGUI()
@@ -210,17 +195,12 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public void UpdateClearGUI()
     {
-        int point = Mathf.RoundToInt((float)system.nail_point / (float)current_level);
-        star_point_controller.gameObject.SetActive(true);
-        star_point_controller.StartStarEffect(point);
+        //To show best point
     }
 
     public void ProcessClearReward()
     {
-        GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-        LimitedDrillManager manager = selector.GetComponent<LimitedDrillManager>();
 
-        manager.GetLimitedDrillForLevel(current_level);
     }
 
     public void UpdatePreFailClearGUI(float time)
@@ -230,42 +210,43 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public void Continue()
     {
-        count_clear_nail++;
-        Manager.Client.SendEventHit("GameSequence", "Continue", current_level.ToString() + "_" + count_clear_nail.ToString());
+        count_clear_nail--;
+        Manager.Client.SendEventHit("GameSequence", "Continue-InfinityMode", count_clear_nail.ToString() + "_" + count_clear_nail.ToString());
 
         star_point_controller.ArrageStar();
     }
 
     public int GetAdvancedDiturbTriggerValue()
     {
-        return current_level;
+        return count_clear_nail;
     }
 
     public void SetLevel(int level)
     {
-        current_level = level;
-        count_clear_nail = current_level;
     }
 
     public bool CheckInterstitialAD()
     {
-        if (current_level >= 5)
+        if (count_clear_nail >= 20)
         {
-            GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-            LimitedDrillManager manager = selector.GetComponent<LimitedDrillManager>();
-
-            if (manager.CheckLimitedDrillForLevel(current_level) < 0
-                && count_clear_nail > 0)
-            {
-                return true;
-            }
+            return true;
         }
         return false;
     }
 
-    public void NextNail()
+    int unit_clear_count_nail;
+    int unit_max_count_nail = 3;
+    public bool CheckNextNail()
     {
+        unit_clear_count_nail++;
         clear_count_text.text = count_clear_nail.ToString();
+
+        if (unit_clear_count_nail >= unit_max_count_nail)
+        {
+            unit_clear_count_nail = 0;
+            return true;
+        }
+        return false;
     }
 
     public bool CheckClearGame()
@@ -275,16 +256,16 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public void TimeGaugeOver()
     {
-        count_clear_nail--;
+        count_clear_nail++;
     }
 
     public void CrashBox()
     {
-        count_clear_nail--;
+        count_clear_nail++;
     }
 
     public void NextStage()
     {
-        current_level = current_level + 1;
+        
     }
 }

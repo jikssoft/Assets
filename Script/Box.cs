@@ -84,11 +84,18 @@ public class Box : MonoBehaviour {
 
     public Queue<GameObject> box_table;
     GameObject current_box_anchor;
+    GameObject last_box;
 
     public void AddBox(GameObject box)
     {
         box_table.Enqueue(box);
-        current_box_anchor = box;
+        current_box_anchor = box_table.Peek();
+        last_box = box;
+    }
+
+    public GameObject GetLastBox()
+    {
+        return last_box;
     }
 
     public GameObject GetCurrentBox()
@@ -124,5 +131,63 @@ public class Box : MonoBehaviour {
         Animator animator = GetComponent<Animator>();
         animator.speed = 1f;
         current_box_anchor.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
+    }
+
+    public void ScrollBox()
+    {
+        float time = 0.2f;
+        foreach(GameObject box in box_table)
+        {
+            iTween.MoveBy(box, new Vector3(-distance_box, 0f), time);
+        }
+    }
+
+    public GameObject infinity_mode_adjust_target_obj;
+    public void AdjustInfinityModeBoxPositionForMultiResolution()
+    {
+        
+        float adjust_distance = 0f;
+
+        if (box_type == Box.BOX_TYPE.RECTANGLE)
+        {
+            adjust_distance = current_box_anchor.GetComponentInChildren<BoxCollider2D>().size.x *
+                current_box_anchor.transform.localScale.x;
+            adjust_distance /= 2f;
+        }
+        else
+        {
+            adjust_distance = current_box_anchor.GetComponentInChildren<CircleCollider2D>().radius *
+                current_box_anchor.transform.localScale.x;
+        }
+
+        adjust_distance = infinity_mode_adjust_target_obj.transform.position.x + adjust_distance;
+
+        current_box_anchor.transform.parent.localPosition = new Vector3(adjust_distance, 0f, 0f);
+
+        /*
+        foreach (GameObject box in box_table)
+        {
+            box.transform.Translate(-adjust_distance, 0f, 0f);
+        }
+        */
+    }
+
+    public void SetFrontBoxToLast()
+    {
+        GameObject box_front = box_table.Dequeue();
+        box_front.transform.localPosition = new Vector3(distance_box * box_table.Count, 0f, 0f);
+
+        AddBox(box_front);
+    }
+    
+    float distance_box;
+    public void SetBoxDistance(float distance)
+    {
+        distance_box = distance;
+    }
+
+    public float GetDistanceBox()
+    {
+        return distance_box;
     }
 }

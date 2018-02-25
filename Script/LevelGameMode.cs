@@ -129,8 +129,41 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
         }
     }
 
-    public IEnumerator ChangeBox()
+    public IEnumerator ChangeBox(bool withShutter)
     {
+        system.first_nail = true;
+        system.drill_time_gause.StopGauseTime();
+
+        if (withShutter == true)
+        {
+            system.shutter_controller.ShutDown();
+            yield return new WaitForSeconds(0.5f);
+
+            system.DrillBoxMenuReset();
+
+            yield return new WaitForSeconds(0.2f);
+            UpdateGUI();
+        }
+        else
+        {
+            system.box.Reset(1f);
+            foreach (GameObject nail in system.nail_table)
+            {
+                Destroy(nail.transform.parent.gameObject);
+            }
+
+            yield return new WaitForSeconds(0.3f);
+
+            system.box.RotateBox();
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        //iTween.MoveTo(box.gameObject, new Vector3(0f, 0f, 0f), 0.2f);
+
+        system.box.ResetRotateBox();
+        
+        //yield return new WaitForSeconds(0.3f);
+        
         star_point_controller.ArrageStar();
 
         system.nail_table.Clear();
@@ -262,9 +295,15 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
         return false;
     }
 
-    public void NextNail()
+    public bool CheckNextNail()
     {
         clear_count_text.text = count_clear_nail.ToString();
+
+        if (system.nail_index >= system.nail_table.Count)
+        {
+            return true;
+        }
+        return false;
     }
 
     public bool CheckClearGame()

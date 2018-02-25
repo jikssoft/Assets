@@ -137,7 +137,7 @@ public class AnchorMultiResolution : MonoBehaviour {
 
     // Set Anchor at Start
 
-    void Start()
+    void Awake()
     {
         setAnchor();
     }

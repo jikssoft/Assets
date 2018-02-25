@@ -125,6 +125,13 @@ public class Nail : MonoBehaviour {
         }
     }
 
+    public void ResetCollision()
+    {
+        collision_state = NAIL_STATE.FAIL;
+        cleared = false;
+
+    }
+
     public void CollisionExit(NAIL_STATE state)
     {
 
