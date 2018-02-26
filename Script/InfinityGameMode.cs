@@ -12,13 +12,14 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
     public GameObject fast_nail_guide_popup;
     public CheerupGuideController cheerup_guide_controller;
 
+    public GameObject game_ui_obj;
+
     // Use this for initialization
     void Start()
     {
         GameObject system_obj = GameObject.FindGameObjectWithTag("System");
         system = system_obj.GetComponent<GameMainLogicSystem>();
         dataSystem = system_obj.GetComponent<GameDataSystem>();
-
     }
 
     // Update is called once per frame
@@ -52,6 +53,8 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public void UpdateGUI()
     {
+        game_ui_obj.SetActive(true);
+
         iTween.FadeTo(clear_count_text.gameObject, 1f, 0.1f);
 
         count_clear_nail = 0;
@@ -84,28 +87,30 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(third_time);
 
-        FastGuidePopup();
+        
 
     }
 
  
     public IEnumerator ReStartGame(float first_time, float second_time, float third_time)
     {
-        cheerup_guide_controller.Hide();
+
 
         yield return new WaitForSeconds(first_time);
 
         UpdateGUI();
 
         Destroy(system.drill.gameObject);
-        system.box.DeleteBox();
+        system.box.DeleteAllBox();
         GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
-        selector.GetComponent<DrillSelector>().ChangeDrill();
+        selector.GetComponent<DrillSelector>().ChangeDrillInfiniteMode();
+        system.box.AdjustInfinityModeBoxPositionForMultiResolution();
 
         star_point_controller.ArrageStar();
 
         system.nail_table.Clear();
-        //system.builder.BuildNail(system.nail_table, count_clear_nail, system.box.box_type);
+        count_clear_nail = 0;
+        system.builder.BuildNailInfinityMode(system.nail_table, count_clear_nail, system.box);
         system.nail_index = 0;
         unit_clear_count_nail = 0;
 
@@ -118,8 +123,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(third_time);
 
-        FastGuidePopup();
-
+        
     }
 
     public IEnumerator ChangeBox(bool withShutter)

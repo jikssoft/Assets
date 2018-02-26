@@ -310,6 +310,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public bool build_nail_table;
     public IEnumerator StartGame()
     {
+        current_game_mode.UpdateGUI();
         tap_process = false;
         iTween.MoveTo(box.gameObject, new Vector3(0f, 0f, 0f), 1f);
 

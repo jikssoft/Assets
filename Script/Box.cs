@@ -126,6 +126,14 @@ public class Box : MonoBehaviour {
         Destroy(box_table.Dequeue());
     }
 
+    public void DeleteAllBox()
+    {
+        while(box_table.Count > 0)
+        {
+            Destroy(box_table.Dequeue());
+        }
+    }
+
     public void ResetRotateBox()
     {
         Animator animator = GetComponent<Animator>();
