@@ -1,10 +1,10 @@
 ﻿using SA.Analytics.Google;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
+public class HellGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 {
     GameDataSystem dataSystem;
     GameMainLogicSystem system;
@@ -37,9 +37,9 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
     {
         bool retval = false;
 
-        int score = dataSystem.GetInifityScore();
+        int score = dataSystem.GetHellScore();
 
-        if (score < count_clear_nail)
+        if(score < count_clear_nail)
         {
             return false;
         }
@@ -64,7 +64,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         game_ui_obj.SetActive(true);
         bg.SetActive(true);
 
-        int score = dataSystem.GetInifityScore();
+        int score = dataSystem.GetHellScore();
         score_text.text = string.Format("BEST {0}", score);
         iTween.FadeTo(clear_count_text.gameObject, 1f, 0.1f);
 
@@ -83,7 +83,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         system.nail_table = new ArrayList();
 
         count_clear_nail = 0;
-        system.builder.BuildNailInfinityMode(system.nail_table, count_clear_nail, system.box);
+        system.builder.BuildNailHellMode(system.nail_table, count_clear_nail, system.box);
         system.nail_index = 0;
         unit_clear_count_nail = 0;
 
@@ -98,11 +98,11 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(third_time);
 
-        
+
 
     }
 
- 
+
     public IEnumerator ReStartGame(float first_time, float second_time, float third_time)
     {
 
@@ -121,7 +121,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         system.nail_table.Clear();
         count_clear_nail = 0;
-        system.builder.BuildNailInfinityMode(system.nail_table, count_clear_nail, system.box);
+        system.builder.BuildNailHellMode(system.nail_table, count_clear_nail, system.box);
         system.nail_index = 0;
         unit_clear_count_nail = 0;
 
@@ -130,11 +130,11 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         system.build_nail_table = true;
 
         yield return new WaitForSeconds(second_time);
-        
+
 
         yield return new WaitForSeconds(third_time);
 
-        
+
     }
 
     public IEnumerator ChangeBox(bool withShutter)
@@ -147,7 +147,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         yield return new WaitForSeconds(0.2f);
 
         int re_position_start_nail_index = system.nail_index - unit_max_count_nail;
-        if(re_position_start_nail_index < 0)
+        if (re_position_start_nail_index < 0)
         {
             re_position_start_nail_index = system.nail_table.Count - unit_max_count_nail;
         }
@@ -156,10 +156,10 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         system.builder.SetRePositionNail(system.nail_table,
                 re_position_start_nail_index,
                 system.box.GetLastBox());
-        
+
         star_point_controller.ArrageStar();
 
-        if(system.nail_index >= system.nail_table.Count)
+        if (system.nail_index >= system.nail_table.Count)
         {
             system.nail_index = 0;
         }
@@ -172,11 +172,12 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return null;
     }
-    
+
     public void FastGuidePopup()
     {
-        
+
     }
+    
 
     public void TapDown()
     {
@@ -201,7 +202,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         count_clear_nail--;
         star_point_controller.gameObject.SetActive(true);
         star_point_controller.StartStarEffect(0);
-        dataSystem.SetInfinityScore(count_clear_nail);
+        dataSystem.SetHellScore(count_clear_nail);
     }
 
     public void UpdateClearGUI()
@@ -277,7 +278,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public void NextStage()
     {
-        
+
     }
 
     public GameObject bg;

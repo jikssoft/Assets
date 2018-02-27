@@ -40,6 +40,7 @@ public class BottomLayerController : MonoBehaviour, Rewardable {
 
     public GameObject retry_button;
     public GameObject share_button;
+    public GameObject mode_button;
     public UISprite ad_movie_sprite;
 
     public UILocalize next_retry_label;
@@ -51,6 +52,7 @@ public class BottomLayerController : MonoBehaviour, Rewardable {
     {
         retry_button.SetActive(false);
         share_button.SetActive(false);
+        mode_button.SetActive(false);
         ad_movie_sprite.gameObject.SetActive(false);
         next_retry_label.transform.parent.gameObject.SetActive(false);
 
@@ -62,6 +64,7 @@ public class BottomLayerController : MonoBehaviour, Rewardable {
     public void SetStartState()
     {
         retry_button.SetActive(false);
+        mode_button.SetActive(false);
         share_button.SetActive(false);
         ad_movie_sprite.gameObject.SetActive(false);
         next_retry_label.transform.parent.gameObject.SetActive(false);
@@ -72,7 +75,8 @@ public class BottomLayerController : MonoBehaviour, Rewardable {
 
     public void SetClearState()
     {
-        retry_button.SetActive(true);
+        retry_button.SetActive(false);
+        mode_button.SetActive(true);
         share_button.SetActive(true);
         ad_movie_sprite.gameObject.SetActive(true);
         next_retry_label.transform.parent.gameObject.SetActive(true);
@@ -94,6 +98,7 @@ public class BottomLayerController : MonoBehaviour, Rewardable {
     public void SetFailState()
     {
         retry_button.SetActive(false);
+        mode_button.SetActive(true);
         share_button.SetActive(false);
         ad_movie_sprite.gameObject.SetActive(true);
         next_retry_label.transform.parent.gameObject.SetActive(true);

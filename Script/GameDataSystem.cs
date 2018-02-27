@@ -34,6 +34,8 @@ public class GameDataSystem : MonoBehaviour {
     public bool check_fast_nail;
     public bool[] drill_purchase_data;
     public bool[] drill_used_data;
+    public int infinity_score_data;
+    public int hell_score_data;
 
     public void SetLevel(int level)
     {
@@ -240,7 +242,36 @@ public class GameDataSystem : MonoBehaviour {
 		}
     }
 
-    void SetDefaultLanguage()
+    public void SetInfinityScore(int score)
+    {
+        if (score > infinity_score_data)
+        {
+            infinity_score_data = score;
+            Save();
+        }
+        
+    }
+
+    public int GetInifityScore()
+    {
+        return infinity_score_data;
+    }
+
+    public void SetHellScore(int score)
+    {
+        if (score > hell_score_data)
+        {
+            hell_score_data = score;
+        }
+        Save();
+    }
+
+    public int GetHellScore()
+    {
+        return hell_score_data;
+    }
+
+void SetDefaultLanguage()
     {
         language_data = 0;
         if (Application.systemLanguage == SystemLanguage.English)
@@ -339,6 +370,8 @@ public class GameDataSystem : MonoBehaviour {
         data.reward_waiting_time = reward_waiting_time;
 		data.drill_purchase = drill_purchase_data;
         data.drill_used = drill_used_data;
+        data.infinity_score = infinity_score_data;
+        data.hell_score = hell_score_data;
 
         MemoryStream memory = new MemoryStream ();
         bf.Serialize(file, data);
@@ -570,11 +603,16 @@ public class GameDataSystem : MonoBehaviour {
             drill_used_data = data.drill_used;
         }
 
+        infinity_score_data = data.infinity_score;
+        hell_score_data = data.hell_score;
+
         if (level_data == 0)
 		{
 			level_data = 1;
 			coin_data = 0;
-		}
+            infinity_score_data = 0;
+            hell_score_data = 0;
+        }
 	}
 
     public TutorualController tutorial_controller;
@@ -602,8 +640,10 @@ public class GameDataSystem : MonoBehaviour {
         check_fast_nail = false;
         last_reward_ad_time = System.DateTime.MinValue;
         reward_waiting_time = 1; // 2 min
-        
-		if (Application.platform == RuntimePlatform.IPhonePlayer) {
+        infinity_score_data = 0;
+        hell_score_data = 0;
+
+        if (Application.platform == RuntimePlatform.IPhonePlayer) {
 			FetchIPhoneGame ();
 		}
         else if(Application.platform == RuntimePlatform.Android) { 
@@ -627,6 +667,8 @@ public class GameDataSystem : MonoBehaviour {
             tutorial_controller.get_coin = true;
             tutorial_controller.ShowTutorial();
             SoundManager.OnOffBGM(false);
+            infinity_score_data = 0;
+            hell_score_data = 0;
         }
 
         Localization.language = Localization.knownLanguages[language_data];
@@ -654,5 +696,7 @@ class GameData
     public bool check_fast_nail;
 	public bool[] drill_purchase = {};
     public bool[] drill_used = {};
+    public int infinity_score;
+    public int hell_score;
 }
 

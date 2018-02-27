@@ -70,4 +70,41 @@ public class GameMenuUI : MonoBehaviour, ReturnKeyProcess
     {
         //BannerController.HideBanner();
     }
+
+    public GameModeUIController game_mode_controller;
+    public void ShowGameModeChangeButton()
+    {
+        game_mode_controller.gameObject.SetActive(true);
+        GameMainLogicSystem system = GameObject.FindGameObjectWithTag("System").GetComponent<GameMainLogicSystem>();
+
+        Debug.Log("update game mode ui");
+
+        if (system.GetCurrentGameMode() is LevelGameMode)
+        {
+            game_mode_controller.SetLevelMode();
+        }
+        else if (system.GetCurrentGameMode() is InfinityGameMode)
+        {
+            game_mode_controller.SetInfiniteMode();
+        }
+        else if (system.GetCurrentGameMode() is HellGameMode)
+        {
+            game_mode_controller.SetHellMode();
+        }
+    }
+
+    public GameObject stat_level_button;
+    public void ShowStarLevelMenuButton()
+    {
+        GameMainLogicSystem system = GameObject.FindGameObjectWithTag("System").GetComponent<GameMainLogicSystem>();
+        
+        if (system.GetCurrentGameMode() is LevelGameMode)
+        {
+            stat_level_button.SetActive(true);
+        }
+        else if (system.GetCurrentGameMode() is InfinityGameMode)
+        {
+            stat_level_button.SetActive(false);
+        }
+    }
 }

@@ -180,6 +180,11 @@ public class Box : MonoBehaviour {
         */
     }
 
+    public void AdjustLevelModeBox()
+    {
+        current_box_anchor.transform.parent.localPosition = new Vector3(0f, 0f, 0f);
+    }
+
     public void SetFrontBoxToLast()
     {
         GameObject box_front = box_table.Dequeue();

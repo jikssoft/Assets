@@ -68,6 +68,7 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     {
         GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
         selector.GetComponent<DrillSelector>().ChangeDrill();
+        system.box.AdjustLevelModeBox();
 
         yield return new WaitForSeconds(first_time);
 
@@ -105,9 +106,10 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
         UpdateGUI();
 
         Destroy(system.drill.gameObject);
-        system.box.DeleteBox();
+        system.box.DeleteAllBox();
         GameObject selector = GameObject.FindGameObjectWithTag("DrillSelector");
         selector.GetComponent<DrillSelector>().ChangeDrill();
+        system.box.AdjustLevelModeBox();
 
         star_point_controller.ArrageStar();
 
@@ -328,5 +330,10 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     public void NextStage()
     {
         current_level = current_level + 1;
+    }
+
+    public void CleanGameMode()
+    {
+        game_ui_obj.SetActive(false);
     }
 }

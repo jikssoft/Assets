@@ -28,6 +28,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         void TimeGaugeOver();
         void CrashBox();
         void NextStage();
+        void CleanGameMode();
     }
 
 
@@ -49,7 +50,13 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     public LevelGameMode level_game_mode;
     public InfinityGameMode infinity_game_mode;
+    public HellGameMode hell_game_mode;
     GameMode current_game_mode;
+
+    public GameMode GetCurrentGameMode()
+    {
+        return current_game_mode;
+    }
 
     void Start () {
         
@@ -68,8 +75,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         camera_size = camera_tweener.GetComponent<Camera>().orthographicSize;
 
-        //current_game_mode = level_game_mode;
-        current_game_mode = infinity_game_mode;
+        current_game_mode = level_game_mode;
     }
 
     public TweenAlpha red_twinkle;
@@ -168,6 +174,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         CheckInterstisialAd();
 
         ActiveAnimation.Play(game_ui_animation, "ShowInGameMenu", AnimationOrTween.Direction.Forward);
+        game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
 
         current_game_mode.UpdateFailGUI();
 
@@ -228,6 +235,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         CheckInterstisialAd();
 
         ActiveAnimation.Play(game_ui_animation, "ShowInGameMenu", AnimationOrTween.Direction.Forward);
+        game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
     }
 
     void MoveBoxAndDrill()
@@ -437,6 +445,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public void SetStartState()
     {
         ActiveAnimation.Play(game_ui_animation, "StartInGameMenu", AnimationOrTween.Direction.Forward);
+        game_ui_animation.GetComponent<GameMenuUI>().ShowGameModeChangeButton();
+        game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
         //bottom_game_menu_controller.SetStartState();
     }
 
@@ -446,6 +456,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         bottom_game_menu_controller.SetPauseState();
         drill_time_gause.PauseGauseTime();
         drill.StopDrillIdleSound();
+
+        ActiveAnimation.Play(game_ui_animation, "StartInGameMenu", AnimationOrTween.Direction.Forward);
+        game_ui_animation.GetComponent<GameMenuUI>().ShowGameModeChangeButton();
+        game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
 
         BannerController.ShowBanner();
     }
@@ -477,6 +491,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         drill_time_gause.StopGauseTime();
     }
 
+    bool tap_down_process = false;
     public void TapDown()
     {
         Debug.Log("------------------" + box.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).normalizedTime);
@@ -489,6 +504,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         {
             return;
         }
+
+        current_nail.SaveStartPos();
+
+        tap_down_process = true;
 
         VibratorController.Vibrate();
 
@@ -716,6 +735,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         yield return new WaitForSeconds(0.2f);
       
 		ActiveAnimation.Play(game_ui_animation, "StartInGameMenu", AnimationOrTween.Direction.Forward);
+        game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
 
         //yield return new WaitForSeconds(0.2f);        
 
@@ -755,10 +775,13 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public void TapUp()
     {
         VibratorController.StopVibrate();
-        if (tap_process == false || time_gause_reset == true )
+        if (tap_process == false || time_gause_reset == true || tap_down_process == false)
         {
             return;
         }
+
+        tap_down_process = false;
+
         StopDisturb();
         drill_time_gause.SetGauseTime(time_gause);
         
@@ -934,7 +957,73 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         drill_time_gause.PauseGauseTime();
     }
 
-    
+    IEnumerator ReStartGameImmediatelySequence()
+    {
+        if (tap_process == false)
+        {
+            yield break;
+        }
+        drill.Stop();
+        tap_process = false;
 
-    
+        first_nail = true;
+
+        DrillBoxMenuReset();
+
+        build_nail_table = false;
+        GameDataSystem dataSystem = GetComponent<GameDataSystem>();
+        current_game_mode.SetLevel(dataSystem.GetLevel());
+        yield return StartCoroutine(current_game_mode.ReStartGame(0f, 0f, 0f));
+        game_ui_animation.GetComponent<GameMenuUI>().ShowGameModeChangeButton();
+
+        drill_time_gause.StopGauseTime();
+        
+        ActiveAnimation.Play(game_ui_animation, "StartInGameMenu", AnimationOrTween.Direction.Forward);
+        game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
+
+        box.ResetRotateBox();
+        
+        current_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
+        box.TurnBox(current_nail);
+
+        SetDrillPositionToCurrentNail();
+
+        current_coin = dataSystem.GetCoin();
+        coin_text.text = current_coin.ToString();
+
+        tap_process = true;
+        input_system.SetActive(true);
+        drill.PlayDrillIdleSound();
+
+        guide_panel.GetComponent<TweenAlpha>().Play(true);
+        yield return new WaitForSeconds(0.5f);
+        guide_panel.GetComponent<Animation>().Play();
+        continue_count = 0;
+    }
+
+    public void ChangeGameModeToInfinity()
+    {
+        current_game_mode.CleanGameMode();
+        current_game_mode = infinity_game_mode;
+        ReStartGameImmediately();
+    }
+
+    public void ChangeGameModeToHell()
+    {
+        current_game_mode.CleanGameMode();
+        current_game_mode = hell_game_mode;
+        ReStartGameImmediately();
+    }
+
+    public void ChangeGameModeToLevel()
+    {
+        current_game_mode.CleanGameMode();
+        current_game_mode = level_game_mode;
+        ReStartGameImmediately();
+    }
+
+    public void ReStartGameImmediately()
+    {
+        StartCoroutine(ReStartGameImmediatelySequence());
+    }
 }

@@ -346,6 +346,69 @@ public class NailBuilder : MonoBehaviour {
         
     }
 
+    public void BuildNailHellMode(ArrayList nail_table, int remainNail, Box box)
+    {
+        Debug.Log("BuildNail level: " + remainNail.ToString());
+        setting_box_type = box.box_type;
+
+        nail_table.Clear();
+
+        foreach (GameObject box_obj in box.box_table)
+        {
+            if (setting_box_type == Box.BOX_TYPE.RECTANGLE)
+            {
+                BuildNailInfinityModeRectangle(nail_table, box_obj);
+            }
+            else if (setting_box_type == Box.BOX_TYPE.CIRCLE)
+            {
+                BuildNailInfinityModeCircle(nail_table, box_obj);
+            }
+        }
+
+        ArrayList index_table = new ArrayList();
+        for (int i = 1; i < nail_table.Count; i++)
+        {
+            index_table.Add(i);
+        }
+
+        foreach (GameObject nail in nail_table)
+        {
+            nail.GetComponent<Nail>().SaveStartPos();
+            nail.GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.PERFECT);
+        }
+
+        /* Random Index
+        if (remainNail % 4 == 0)
+        {
+            for (int t = 0; t < nail_table.Count; t++)
+            {
+                GameObject tmp = (GameObject)(nail_table[t]);
+                int r = Random.Range(t, nail_table.Count);
+                nail_table[t] = nail_table[r];
+                nail_table[r] = tmp;
+            }
+        }
+        */
+
+        /*
+        if (level >= 13 && level < 20)
+        {
+            BuildRandomSpeedSlowDisturb(nail_table, index_table);
+            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 1);
+        }
+        else if (level >= 20)
+        {
+            BuildRandomSpeedSlowDisturb(nail_table, index_table);
+            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 2);
+        }
+        //BuildRandomDisturb(nail_table);
+        */
+
+        BuildCoinNail(nail_table);
+
+
+    }
+
     float infinity_mode_init_x_pos = -2f;
     public void BuildNailInfinityModeRectangle(ArrayList nail_table, GameObject anchor)
     {
