@@ -94,7 +94,7 @@ public class HellGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(second_time);
 
-
+        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, -2.58f, 0f), "time", 0.3f, "islocal", true));
 
         yield return new WaitForSeconds(third_time);
 
@@ -131,6 +131,7 @@ public class HellGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(second_time);
 
+        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, -2.58f, 0f), "time", 0.3f, "islocal", true));
 
         yield return new WaitForSeconds(third_time);
 

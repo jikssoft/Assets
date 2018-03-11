@@ -106,7 +106,15 @@ public class Box : MonoBehaviour {
     public Vector3 shake_pos;
     public void Operate( )
     {
-        iTween.ShakePosition(current_box_anchor, iTween.Hash("amount", shake_pos, "time", float.MaxValue, "islocal", true));
+        if (current_box_anchor.GetComponent<iTween>() == null)
+        {
+            iTween.ShakePosition(current_box_anchor, iTween.Hash("amount", shake_pos, "time", float.MaxValue, "islocal", true));
+        }
+        else
+        {
+            current_box_anchor.GetComponent<iTween>().
+        }
+
     }
 
     public void Stop()
@@ -143,7 +151,7 @@ public class Box : MonoBehaviour {
 
     public void ScrollBox()
     {
-        float time = 0.2f;
+        float time = 0.1f;
         foreach(GameObject box in box_table)
         {
             iTween.MoveBy(box, new Vector3(-distance_box, 0f), time);
@@ -185,12 +193,20 @@ public class Box : MonoBehaviour {
         current_box_anchor.transform.parent.localPosition = new Vector3(0f, 0f, 0f);
     }
 
+    GameObject last_selected_box = null;
+    public void NextBox()
+    {
+        last_selected_box = box_table.Dequeue();
+        current_box_anchor = box_table.Peek();
+        last_box = current_box_anchor;
+    }
+
     public void SetFrontBoxToLast()
     {
-        GameObject box_front = box_table.Dequeue();
-        box_front.transform.localPosition = new Vector3(distance_box * box_table.Count, 0f, 0f);
 
-        AddBox(box_front);
+        last_selected_box.transform.localPosition = new Vector3(distance_box * box_table.Count, 0f, 0f);
+
+        AddBox(last_selected_box);
     }
     
     float distance_box;

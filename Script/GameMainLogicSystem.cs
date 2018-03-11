@@ -335,7 +335,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         current_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
         box.TurnBox(current_nail);
         coin_text.text = current_coin.ToString();
-        iTween.MoveTo(box.gameObject, iTween.Hash("position", new Vector3(0f, -3f, 0f), "time", 0.3f, "islocal", true));
+        
         SetDrillPositionToCurrentNail();
 
         yield return new WaitForSeconds(0.3f);
@@ -369,6 +369,12 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     bool tap_process = false;
     public ShutterController shutter_controller;
+
+    public void SetSystemTapProcess()
+    {
+        tap_process = true;
+    }
+
     IEnumerator ChangeBox(bool withShutter)
     {
         if(tap_process == false)
@@ -735,6 +741,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         yield return new WaitForSeconds(0.2f);
       
 		ActiveAnimation.Play(game_ui_animation, "StartInGameMenu", AnimationOrTween.Direction.Forward);
+        game_ui_animation.GetComponent<GameMenuUI>().ShowGameModeChangeButton();
         game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
 
         //yield return new WaitForSeconds(0.2f);        

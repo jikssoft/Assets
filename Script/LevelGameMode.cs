@@ -85,6 +85,7 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
 
         yield return new WaitForSeconds(second_time);
 
+        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, -3f, 0f), "time", 0.3f, "islocal", true));
         cheerup_guide_controller.Show(current_level);
 
         yield return new WaitForSeconds(third_time);
@@ -123,6 +124,7 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
 
         yield return new WaitForSeconds(second_time);
 
+        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, -3f, 0f), "time", 0.3f, "islocal", true));
         cheerup_guide_controller.Show(current_level);
 
         yield return new WaitForSeconds(third_time);
@@ -335,5 +337,6 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     public void CleanGameMode()
     {
         game_ui_obj.SetActive(false);
+        cheerup_guide_controller.Hide();
     }
 }

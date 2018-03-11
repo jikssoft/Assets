@@ -94,7 +94,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(second_time);
 
-
+        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, -2.58f, 0f), "time", 0.3f, "islocal", true));
 
         yield return new WaitForSeconds(third_time);
 
@@ -130,7 +130,7 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         system.build_nail_table = true;
 
         yield return new WaitForSeconds(second_time);
-        
+        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, -2.58f, 0f), "time", 0.3f, "islocal", true));
 
         yield return new WaitForSeconds(third_time);
 
@@ -143,8 +143,20 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         system.drill_time_gause.StopGauseTime();
 
         system.box.ScrollBox();
-        system.builder.ScrollNails(system.nail_table, -system.box.GetDistanceBox(), 0.2f);
-        yield return new WaitForSeconds(0.2f);
+        system.builder.ScrollNails(system.nail_table, -system.box.GetDistanceBox(), 0.1f);
+        
+        system.build_nail_table = true;
+
+        yield return new WaitForSeconds(0.1f);
+
+        if (system.nail_index >= system.nail_table.Count)
+        {
+            system.nail_index = 0;
+        }
+
+        system.SetNextNail();
+        system.box.NextBox();
+        system.SetSystemTapProcess();
 
         int re_position_start_nail_index = system.nail_index - unit_max_count_nail;
         if(re_position_start_nail_index < 0)
@@ -158,17 +170,10 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
                 system.box.GetLastBox());
         
         star_point_controller.ArrageStar();
-
-        if(system.nail_index >= system.nail_table.Count)
-        {
-            system.nail_index = 0;
-        }
-
-        system.SetNextNail();
-
+        
         clear_count_text.text = count_clear_nail.ToString();
 
-        system.build_nail_table = true;
+        
 
         yield return null;
     }
