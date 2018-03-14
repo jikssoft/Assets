@@ -106,15 +106,7 @@ public class Box : MonoBehaviour {
     public Vector3 shake_pos;
     public void Operate( )
     {
-        if (current_box_anchor.GetComponent<iTween>() == null)
-        {
-            iTween.ShakePosition(current_box_anchor, iTween.Hash("amount", shake_pos, "time", float.MaxValue, "islocal", true));
-        }
-        else
-        {
-            current_box_anchor.GetComponent<iTween>().
-        }
-
+        iTween.ShakePosition(current_box_anchor, iTween.Hash("amount", shake_pos, "time", float.MaxValue, "islocal", true));
     }
 
     public void Stop()
@@ -154,7 +146,11 @@ public class Box : MonoBehaviour {
         float time = 0.1f;
         foreach(GameObject box in box_table)
         {
-            iTween.MoveBy(box, new Vector3(-distance_box, 0f), time);
+            iTween.MoveTo(box, new Vector3(box.transform.position.x - distance_box,
+                box.transform.position.y,
+                box.transform.position.z),
+                time);
+            //iTween.MoveBy(box, new Vector3(-distance_box, 0f), time);
         }
     }
 

@@ -147,8 +147,6 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         
         system.build_nail_table = true;
 
-        yield return new WaitForSeconds(0.1f);
-
         if (system.nail_index >= system.nail_table.Count)
         {
             system.nail_index = 0;
@@ -158,11 +156,15 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         system.box.NextBox();
         system.SetSystemTapProcess();
 
+        yield return new WaitForSeconds(0.1f);
+        
         int re_position_start_nail_index = system.nail_index - unit_max_count_nail;
         if(re_position_start_nail_index < 0)
         {
             re_position_start_nail_index = system.nail_table.Count - unit_max_count_nail;
         }
+
+        yield return new WaitForSeconds(0.1f);
 
         system.box.SetFrontBoxToLast();
         system.builder.SetRePositionNail(system.nail_table,
