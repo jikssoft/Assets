@@ -47,7 +47,7 @@ namespace SA.IOSNative.UserNotifications {
 		}
 
 		void LaunchNotification(string data) {
-			NotificationCenter.SetLaunchNotifification (data);
+			NotificationCenter.SetLastNotifification (data);
 		}
 
 	}

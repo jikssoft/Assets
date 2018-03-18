@@ -286,9 +286,8 @@ public class NailBuilder : MonoBehaviour {
 
     public void BuildNailInfinityMode(ArrayList nail_table, int remainNail, Box box)
     {
-        Debug.Log("BuildNail level: " + remainNail.ToString());
         setting_box_type = box.box_type;
-        
+
         nail_table.Clear();
 
         foreach (GameObject box_obj in box.box_table)
@@ -314,41 +313,19 @@ public class NailBuilder : MonoBehaviour {
             nail.GetComponent<Nail>().SaveStartPos();
         }
 
-        /* Random Index
-        if (remainNail % 4 == 0)
-        {
-            for (int t = 0; t < nail_table.Count; t++)
-            {
-                GameObject tmp = (GameObject)(nail_table[t]);
-                int r = Random.Range(t, nail_table.Count);
-                nail_table[t] = nail_table[r];
-                nail_table[r] = tmp;
-            }
-        }
-        */
+        int speed1 = Random.Range(1, nail_table.Count);
+        int speed2 = Random.Range(1, nail_table.Count);
+        int slow1 = Random.Range(1, nail_table.Count);
 
-        /*
-        if (level >= 13 && level < 20)
-        {
-            BuildRandomSpeedSlowDisturb(nail_table, index_table);
-            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 1);
-        }
-        else if (level >= 20)
-        {
-            BuildRandomSpeedSlowDisturb(nail_table, index_table);
-            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 2);
-        }
-        //BuildRandomDisturb(nail_table);
-        */
+        ((GameObject)nail_table[speed1]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.TWICE_SPEED);
+        ((GameObject)nail_table[speed2]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.TWICE_SPEED);
+        ((GameObject)nail_table[slow1]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.SLOW_SPEED);
 
         BuildCoinNail(nail_table);
-
-        
     }
 
     public void BuildNailHellMode(ArrayList nail_table, int remainNail, Box box)
     {
-        Debug.Log("BuildNail level: " + remainNail.ToString());
         setting_box_type = box.box_type;
 
         nail_table.Clear();
@@ -377,36 +354,16 @@ public class NailBuilder : MonoBehaviour {
             nail.GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.PERFECT);
         }
 
-        /* Random Index
-        if (remainNail % 4 == 0)
-        {
-            for (int t = 0; t < nail_table.Count; t++)
-            {
-                GameObject tmp = (GameObject)(nail_table[t]);
-                int r = Random.Range(t, nail_table.Count);
-                nail_table[t] = nail_table[r];
-                nail_table[r] = tmp;
-            }
-        }
-        */
+        int speed1 = Random.Range(1, nail_table.Count);
+        int speed2 = Random.Range(1, nail_table.Count);
+        int slow1 = Random.Range(1, nail_table.Count);
 
-        /*
-        if (level >= 13 && level < 20)
-        {
-            BuildRandomSpeedSlowDisturb(nail_table, index_table);
-            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 1);
-        }
-        else if (level >= 20)
-        {
-            BuildRandomSpeedSlowDisturb(nail_table, index_table);
-            BuildRandomRotateZoomPerfectDisturb(nail_table, index_table, 2);
-        }
-        //BuildRandomDisturb(nail_table);
-        */
+        ((GameObject)nail_table[speed1]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.PERFECT_SPEED);
+        ((GameObject)nail_table[speed2]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.PERFECT_SPEED);
+        ((GameObject)nail_table[slow1]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.PERFECT_SLOW);
+
 
         BuildCoinNail(nail_table);
-
-
     }
 
     float infinity_mode_init_x_pos = -2f;
@@ -518,13 +475,14 @@ public class NailBuilder : MonoBehaviour {
 
         float distance_horizontal = (4f + (-2f * adjust_distance_horizontal)) / (float)(count - 1);
 
-        GameObject nail = ((GameObject)nailTable[index]);
-        GameObject nail_anchor = nail.transform.parent.gameObject;
+        GameObject remove_nail = ((GameObject)nailTable[index]);
+        GameObject nail_new = (GameObject)Instantiate(nail, remove_nail.transform.parent);
+        Destroy(remove_nail);
+        nailTable[index] = nail_new;
+        GameObject nail_anchor = nail_new.transform.parent.gameObject;
         nail_anchor.transform.position = anchor.transform.position;
         nail_anchor.transform.Rotate(0f, 0f, 0f);
-
-        //GameObject nail_new = (GameObject)Instantiate(nail, pos, rotation, nail_anchor.transform);
-
+        
         Vector3 local_pos = new Vector3();
         float y_pos = Random.Range(min_y * 0.8f, max_y * 0.8f) + (adjust_y_vertical);
         local_pos.Set(infinity_mode_init_x_pos + 
@@ -534,15 +492,14 @@ public class NailBuilder : MonoBehaviour {
             10f);
         local_pos.x *= scale.x;
 
-        nail.transform.localPosition = local_pos;
+        nail_new.transform.localPosition = local_pos;
 
-        nail.GetComponent<Nail>().ResetCollision();
+        nail_new.GetComponent<Nail>().ResetCollision();
 
     }
 
     public void BuildNailInfinityModeCircle(ArrayList nail_table, GameObject anchor)
     {
-        Vector3 pos = new Vector3();
         Quaternion rotation = Quaternion.identity;
 
         GameObject nail_table_obj = GameObject.FindGameObjectWithTag("NailTable");
@@ -577,7 +534,6 @@ public class NailBuilder : MonoBehaviour {
 
     public void ReBuildNailInfinityModeCircle(ArrayList nailTable, int index, GameObject anchor)
     {
-        Vector3 pos = new Vector3();
         Quaternion rotation = Quaternion.identity;
 
         GameObject nail_table_obj = GameObject.FindGameObjectWithTag("NailTable");
@@ -589,18 +545,21 @@ public class NailBuilder : MonoBehaviour {
         GameMainLogicSystem system = systemObj.GetComponent<GameMainLogicSystem>();
         CircleCollider2D box_collider = system.box.GetCurrentBox().GetComponentInChildren<CircleCollider2D>();
 
-        GameObject nail = ((GameObject)nailTable[index]);
-        GameObject nail_anchor = nail.transform.parent.gameObject;
+        GameObject remove_nail = ((GameObject)nailTable[index]);
+        GameObject nail_new = (GameObject)Instantiate(nail, remove_nail.transform.parent);
+        Destroy(remove_nail);
+        nailTable[index] = nail_new;
+        GameObject nail_anchor = nail_new.transform.parent.gameObject;
 
         nail_anchor.transform.position = anchor.transform.position;
-        nail_anchor.transform.Rotate(0f, 0f, 0f);
+        nail_anchor.transform.localRotation = Quaternion.identity;
 
 
         Vector3 local_pos = new Vector3();
         float y_pos = Random.Range(min_y * 0.8f, max_y * 0.8f);
         local_pos.Set(0f, y_pos, 10f);
 
-        nail.transform.localPosition = local_pos;
+        nail_new.transform.localPosition = local_pos;
         
         nail_anchor.transform.Rotate(0f, 0f, angle + ((index % 3) * unit_angle));
     }
@@ -614,9 +573,8 @@ public class NailBuilder : MonoBehaviour {
         }
     }
 
-    public void SetRePositionNail(ArrayList nail_table, int startIndex, GameObject targetBox)
+    public void SetRePositionNail(ArrayList nail_table, int startIndex, GameObject targetBox, bool hellmode)
     {
-      
         for(int i = 0; i < 3; i++)
         {
             if (setting_box_type == Box.BOX_TYPE.RECTANGLE)
@@ -627,11 +585,46 @@ public class NailBuilder : MonoBehaviour {
             {
                 ReBuildNailInfinityModeCircle(nail_table, startIndex + i, targetBox);
             }
+
+            float random = Random.Range(0f, 1f);
+
+            Nail nail = ((GameObject)nail_table[startIndex + i]).GetComponent<Nail>();
+
+            if(hellmode == true)
+            {
+                nail.SetDisturbType(Nail.DISTURB_TYPE.PERFECT);
+            }
+            
+            if (random < 0.15f)
+            {
+                if (hellmode == true)
+                {
+                    nail.SetDisturbType(Nail.DISTURB_TYPE.PERFECT_SLOW);
+                }
+                else
+                {
+                    nail.SetDisturbType(Nail.DISTURB_TYPE.SLOW_SPEED);
+                }
+            }
+            else if (random < 0.3f)
+            {
+                if (hellmode == true)
+                {
+                    nail.SetDisturbType(Nail.DISTURB_TYPE.PERFECT_SPEED);
+                }
+                else
+                {
+                    nail.SetDisturbType(Nail.DISTURB_TYPE.TWICE_SPEED);
+                }
+            }
+
+            if (random < 0.1f)
+            {
+                nail.SetCoin(true);
+            }
         }
     }
-
-
-
+    
     void ArrangeNailByLevel(ArrayList nail_table, int remainNail)
     {
         int arrange_count = (count * 4) - (remainNail % (count * 4));
@@ -706,9 +699,6 @@ public class NailBuilder : MonoBehaviour {
         Quaternion rotation = Quaternion.identity;
 
         GameObject nail_table_obj = GameObject.FindGameObjectWithTag("NailTable");
-
-        float angle = -30f;
-        float unit_angle = 30f;
 
         if (index >= 0 && index < 3)
         {

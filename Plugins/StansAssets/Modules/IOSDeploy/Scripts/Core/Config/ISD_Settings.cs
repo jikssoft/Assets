@@ -27,7 +27,7 @@ namespace SA.IOSDeploy {
 	#endif
 	public class ISD_Settings : ScriptableObject{
 
-		public const string VERSION_NUMBER = "3.4/21";
+		public const string VERSION_NUMBER = "3.5/" + SA.Common.Config.LIB_VERSION;
 
 
 		//Editor Window
@@ -55,6 +55,8 @@ namespace SA.IOSDeploy {
 		public List<Variable>  PlistVariables =  new List<Variable>();
 		public List<VariableId> VariableDictionary = new List<VariableId>();
 		public List<string> langFolders = new List<string>();
+
+        public List<AssetFile> Files = new List<AssetFile>();
 
 		
 		private const string ISDAssetName = "ISD_Settings";

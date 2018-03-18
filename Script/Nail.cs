@@ -5,7 +5,19 @@ public class Nail : MonoBehaviour {
 
     public enum NAIL_STATE { FAIL, GOOD, PERFECT, AMAZING }
     public enum DIRECTION { UP, DOWN, LEFT, RIGHT }
-    public enum DISTURB_TYPE {NORMAL, ROTATE, ZOOM_OUT, ZOOM_IN, PRE_ZOOM_OUT, PRE_ZOOM_IN, PERFECT, TWICE_SPEED, SLOW_SPEED}
+    public enum DISTURB_TYPE {
+        NORMAL,
+        ROTATE,
+        ZOOM_OUT,
+        ZOOM_IN,
+        PRE_ZOOM_OUT,
+        PRE_ZOOM_IN,
+        TWICE_SPEED,
+        SLOW_SPEED,
+        PERFECT,
+        PERFECT_SPEED,
+        PERFECT_SLOW
+    }
 
     public DIRECTION direction;
     public NAIL_STATE collision_state;
@@ -16,6 +28,8 @@ public class Nail : MonoBehaviour {
     public Sprite fast_nail;
     public Sprite slow_nail;
     public Sprite perfect_nail;
+    public Sprite perfect_slow_nail;
+    public Sprite perfect_fast_nail;
 
     public Sprite guide_slow_down;
     public Sprite guide_perfect;
@@ -52,6 +66,16 @@ public class Nail : MonoBehaviour {
             nail_sprite.sprite = perfect_nail;
             //guide.GetComponent<LocalizeTextMesh>().SetKey("Perfect Only");
             //guide.SetActive(true);
+        }
+        else if(type == DISTURB_TYPE.PERFECT_SLOW)
+        {
+            nail_sprite.sprite = perfect_slow_nail;
+        }
+        else if(type == DISTURB_TYPE.PERFECT_SPEED)
+        {
+            nail_sprite.sprite = perfect_fast_nail;
+            guide.GetComponent<LocalizeTextMesh>().SetKey("Fast");
+            guide.SetActive(true);
         }
         else if(type == DISTURB_TYPE.TWICE_SPEED)
         {

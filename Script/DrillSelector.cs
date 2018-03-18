@@ -111,16 +111,18 @@ public class DrillSelector : MonoBehaviour {
 
             get_limeted_drill_index = -1;
         }
+        
+        float width_box = 0f;
+        float distance_box = 0.5f;
+        int box_count = 5;
+        float box_scale = 0.7f;
+        float drill_scale = 0.8f;
 
         GameObject drill = Instantiate(drill_table[select_index]);
 
         system.drill = drill.GetComponent<Drill>();
         system.drill_time_gause = drill.GetComponentInChildren<DrillTimeGause>();
-
-        float width_box = 0f;
-        float distance_box = 0.5f;
-        float scale = 0.7f;
-        int box_count = 5;
+        drill.transform.localScale = new Vector3(drill_scale, drill_scale, drill_scale);
 
         for (int i = 0; i < box_count; i++)
         {
@@ -129,17 +131,17 @@ public class DrillSelector : MonoBehaviour {
 
             if (system.drill.box_type == Box.BOX_TYPE.RECTANGLE)
             {
-                width_box = box.GetComponentInChildren<BoxCollider2D>().size.x * scale;
+                width_box = box.GetComponentInChildren<BoxCollider2D>().size.x * box_scale;
             }
             else
             {
-                width_box = box.GetComponentInChildren<CircleCollider2D>().radius * 2f * scale;
+                width_box = box.GetComponentInChildren<CircleCollider2D>().radius * 2f * box_scale;
             }
 
             box.transform.parent = box_parent.transform;
             box.transform.rotation = new Quaternion(0f, 0f, 0f, 0f);
             box.transform.localPosition = new Vector3((width_box + distance_box) * i, 0f, 0f);
-            box.transform.localScale = new Vector3(scale, scale, 1f);
+            box.transform.localScale = new Vector3(box_scale, box_scale, 1f);
             box.GetComponentInChildren<Rigidbody2D>().collisionDetectionMode = CollisionDetectionMode2D.Continuous;
         }
 

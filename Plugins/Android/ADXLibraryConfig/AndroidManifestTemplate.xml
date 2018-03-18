@@ -1,0 +1,24 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.adxcorp.library.unity"
+    xmlns:tools="http://schemas.android.com/tools" >
+    
+    <application>
+        <meta-data
+            android:name="app_license"
+            android:value="Please input your app_license key"
+            tools:node="replace"/>
+
+    	<!-- for AdMob -->
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
+
+        <!-- Please replace ${applicationId} to your package name-->
+        <provider
+            android:name="com.duapps.ad.stats.DuAdCacheProvider"
+            android:authorities="${applicationId}.DuAdCacheProvider"
+            android:exported="false"
+            tools:node="replace" />
+    </application>
+</manifest>

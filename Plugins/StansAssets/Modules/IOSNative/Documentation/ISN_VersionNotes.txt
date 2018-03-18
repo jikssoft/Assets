@@ -1,3 +1,7 @@
+9.11/22
+New Rate Us popup: https://goo.gl/4ffHoq
+New Copy to clipboard API: https://goo.gl/k7D2RG
+
 9.8/20
 New user notifications API
 Embeded freamworks support 

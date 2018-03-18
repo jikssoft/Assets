@@ -417,16 +417,18 @@ public class AndroidNativeSettingsEditor : Editor {
 		AndroidNativeSettings.Instance.InAppProducts.Add(new GoogleProductTemplate(){ SKU = "small_coins_bag", 	Title = "Small Coins Bag", IsOpen = false});
 		AndroidNativeSettings.Instance.InAppProducts.Add(new GoogleProductTemplate(){ SKU = "pm_coins", 		Title = "Coins Pack", IsOpen = false});
 		AndroidNativeSettings.Instance.InAppProducts.Add(new GoogleProductTemplate(){ SKU = "pm_green_sphere", 	Title = "Green Sphere", IsOpen = false});
-		AndroidNativeSettings.Instance.InAppProducts.Add(new GoogleProductTemplate(){ SKU = "pm_red_sphere", 	Title = "Red Sphere", IsOpen = false});
-		
+		AndroidNativeSettings.Instance.InAppProducts.Add(new GoogleProductTemplate(){ SKU = "pm_red_sphere", 	Title = "Red Sphere", IsOpen = false});		
 		
 		AndroidNativeSettings.Instance.SoomlaEnvKey = "3c3df370-ad80-4577-8fe5-ca2c49b2c1b4";
 		AndroidNativeSettings.Instance.SoomlaGameKey = "db24ba61-3aa7-4653-a3f7-9c613cb2c0f3";
 		
 		AndroidNativeSettings.Instance.GCM_SenderId = "216817929098";
 		AndroidNativeSettings.Instance.GooglePlayServiceAppID = "216817929098";
-		
-		SA.Common.Editor.Tools.ApplicationIdentifier = "com.unionassets.android.plugin.preview";
+
+		if(EditorUserBuildSettings.activeBuildTarget.Equals(BuildTarget.Android))
+			SA.Common.Editor.Tools.ApplicationIdentifier = "com.unionassets.android.plugin.preview";
+		else
+			SA.Common.Editor.Tools.ApplicationIdentifier = "com.sa.an";
 		
 		SocialPlatfromSettingsEditor.LoadExampleSettings();
 	}
@@ -1149,6 +1151,7 @@ public class AndroidNativeSettingsEditor : Editor {
 			
 			AdActivity.SetValue ("android:configChanges", "keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize");
 			AdActivity.SetValue ("android:theme", "@android:style/Theme.Translucent");
+			AdActivity.SetValue ("android:exported", "false");
 		} else {
 			application.RemoveActivity(AdActivity);
 		}
@@ -1822,7 +1825,11 @@ public class AndroidNativeSettingsEditor : Editor {
 					product.IsOpen 	= EditorGUILayout.Foldout(product.IsOpen, product.Title);
 					
 					
-					EditorGUILayout.LabelField(product.Price + "$");
+					string tmpPrice = EditorGUILayout.TextField(product.Price + "$");
+					if(tmpPrice.Length > 0) {
+						product.LocalizedPrice = tmpPrice.Trim ();
+						product.PriceAmountMicros = (long)System.Convert.ToDouble(tmpPrice.Replace("$", "").Trim());
+					}
 					bool ItemWasRemoved = DrawSortingButtons((object) product, AndroidNativeSettings.Instance.InAppProducts);
 					if(ItemWasRemoved) {
 						return;

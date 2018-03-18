@@ -21,7 +21,7 @@ using UnityEditor;
 
 public class IOSNativeSettings : ScriptableObject {
 
-	public const string VERSION_NUMBER = "9.10/21";
+    public const string VERSION_NUMBER = "9.11/" + SA.Common.Config.LIB_VERSION;
 
 
 	//--------------------------------------
@@ -72,6 +72,7 @@ public class IOSNativeSettings : ScriptableObject {
 
 	public bool InAppsEditorTesting = true;
 	public bool CheckInternetBeforeLoadRequest = false;
+	public bool PromotedPurchaseSupport = true;
 	public TransactionsHandlingMode  TransactionsHandlingMode = TransactionsHandlingMode.Automatic;
 
 	public List<string> DefaultStoreProductsView = new List<string>();

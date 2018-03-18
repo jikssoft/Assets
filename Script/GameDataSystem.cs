@@ -47,6 +47,8 @@ public class GameDataSystem : MonoBehaviour {
         {
             Manager.Client.SendEventHit("set level", "set level", level.ToString());
             level_data = level;
+            LeaderBoardManager.UpdateBestLevel(level);
+
             Save();
         }
     }
@@ -247,6 +249,7 @@ public class GameDataSystem : MonoBehaviour {
         if (score > infinity_score_data)
         {
             infinity_score_data = score;
+            LeaderBoardManager.UpdateBestScoreInfinityMode(score);
             Save();
         }
         
@@ -262,8 +265,10 @@ public class GameDataSystem : MonoBehaviour {
         if (score > hell_score_data)
         {
             hell_score_data = score;
+            LeaderBoardManager.UpdateBestScoreHellMode(score);
+            Save();
         }
-        Save();
+        
     }
 
     public int GetHellScore()
@@ -442,6 +447,7 @@ void SetDefaultLanguage()
     {
         
         Debug.Log("google play service connect");
+        LeaderBoardManager.LoadLeaderboard();
 
         GooglePlayConnection.ActionPlayerConnected -= OnPlayerConnected;
 

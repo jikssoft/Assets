@@ -407,7 +407,7 @@ namespace SA.Common.Editor {
 		public static void EnableAnalyticsAPI() {
 			#if UNITY_4_6 || UNITY_4_7
 			SA.Common.Util.Files.CopyFile(SA.Common.Config.ANDROID_SOURCE_PATH + "google_play/play-services-analytics.jar.txt", 	SA.Common.Config.ANDROID_DESTANATION_PATH + "libs/play-services-analytics.jar");
-			SA.Common.Util.Files.CopyFile(SA.Common.Config.ANDROID_SOURCE_PATH + "google_play/play-services-analytics-impl.txt", 	SA.Common.Config.ANDROID_DESTANATION_PATH + "libs/play-services-analytics-impl.aar");
+			SA.Common.Util.Files.CopyFile(SA.Common.Config.ANDROID_SOURCE_PATH + "google_play/play-services-analytics-impl.jar.txt", 	SA.Common.Config.ANDROID_DESTANATION_PATH + "libs/play-services-analytics-impl.jar");
 			#else
 			SA.Common.Util.Files.CopyFile(SA.Common.Config.ANDROID_SOURCE_PATH + "google_play/play-services-analytics.txt", 	SA.Common.Config.ANDROID_DESTANATION_PATH + "libs/play-services-analytics.aar");
 			SA.Common.Util.Files.CopyFile(SA.Common.Config.ANDROID_SOURCE_PATH + "google_play/play-services-analytics-impl.txt", 	SA.Common.Config.ANDROID_DESTANATION_PATH + "libs/play-services-analytics-impl.aar");
@@ -756,7 +756,8 @@ namespace SA.Common.Editor {
                     || SA.Common.Util.Files.IsFileExists("Plugins/Facebook/Scripts/FB.cs")
                     || SA.Common.Util.Files.IsFileExists("FacebookSDK/SDK/Scripts/FB.cs")
 					|| SA.Common.Util.Files.IsFileExists("FacebookSDK/Plugins/Facebook.Unity.dll")
-					|| SA.Common.Util.Files.IsFileExists("Plugins/FacebookSDK/Plugins/Facebook.Unity.dll");
+					|| SA.Common.Util.Files.IsFileExists("Plugins/FacebookSDK/Plugins/Facebook.Unity.dll")
+					|| SA.Common.Util.Files.IsFileExists("FacebookSDK/SDK/Resources/FacebookSettings.asset");
 			}
 		}
 		

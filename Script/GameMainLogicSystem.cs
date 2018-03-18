@@ -7,7 +7,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 {
     public interface GameMode
     {
-        void TapUp();
+        void TapUp(ref int point);
         void TapDown();
         IEnumerator StartGame(float first_time, float second_time, float third_time);
         IEnumerator ReStartGame(float first_time, float second_time, float third_time);
@@ -29,6 +29,9 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         void CrashBox();
         void NextStage();
         void CleanGameMode();
+        void SetDrillPosition();
+        void MoveBoxAndDrill();
+        void ShowLeaderBoard();
     }
 
 
@@ -240,13 +243,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     void MoveBoxAndDrill()
     {
-        float time = 0.3f;
-        iTween.ScaleTo(box.gameObject, iTween.Hash("scale", new Vector3(0.7f, 0.7f, 0.7f), "time", time, "easetype", iTween.EaseType.linear));
-        drill.StartCoroutine(drill.SetDrillPositionToTarget(drill_clear_point.transform, time, 0f, true));
-        box.Reset(2f);
-        drill_time_gause.DisableGauseTime();
-
-        current_game_mode.UpdatePreFailClearGUI(time);
+        current_game_mode.MoveBoxAndDrill();
     }
 
     public void UpateGUI()
@@ -391,16 +388,9 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         current_nail = ((GameObject)(nail_table[nail_index])).GetComponent<Nail>();
         box.TurnBox(current_nail);
 
-        if (withShutter == false)
-        {
-            drill.StartCoroutine(drill.SetDrillPositionToTarget(current_nail.transform, 0.2f, 0f, true));
-        }
-        else
-        {
-            continue_count = 0;
-            SetDrillPositionToCurrentNail();
-        }
-        
+
+        current_game_mode.SetDrillPosition();
+
         //iTween.MoveTo(box.gameObject, iTween.Hash("position", new Vector3(0f, -3f, 0f), "time", 0.3f, "islocal", true));
         
         if (withShutter == true)
@@ -433,7 +423,8 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
             play_disturb_perfect_text_ani.Play(true);
         }
 
-        if (current_nail.disturb_type == Nail.DISTURB_TYPE.TWICE_SPEED)
+        if (current_nail.disturb_type == Nail.DISTURB_TYPE.TWICE_SPEED ||
+            current_nail.disturb_type == Nail.DISTURB_TYPE.PERFECT_SPEED)
         {
             play_disturb_speed_text_ani.gameObject.SetActive(true);
             play_disturb_speed_text_ani.Play(true);
@@ -553,11 +544,13 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         {
 
         }
-        else if (current_nail.disturb_type == Nail.DISTURB_TYPE.TWICE_SPEED)
+        else if (current_nail.disturb_type == Nail.DISTURB_TYPE.TWICE_SPEED ||
+            current_nail.disturb_type == Nail.DISTURB_TYPE.PERFECT_SPEED)
         {
             drill_operate_speed = drill_speed * fast_drill_speed;
         }
-        else if (current_nail.disturb_type == Nail.DISTURB_TYPE.SLOW_SPEED)
+        else if (current_nail.disturb_type == Nail.DISTURB_TYPE.SLOW_SPEED ||
+            current_nail.disturb_type == Nail.DISTURB_TYPE.PERFECT_SLOW)
         {
             drill_operate_speed = drill_speed * 0.6f;
         }
@@ -646,7 +639,7 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     void StopDisturb()
     {
-        if (current_nail.disturb_type == Nail.DISTURB_TYPE.PERFECT)
+        if (current_nail.disturb_type >= Nail.DISTURB_TYPE.PERFECT)
         {
             play_disturb_perfect_text_ani.gameObject.SetActive(false);
             if (current_nail.collision_state != Nail.NAIL_STATE.PERFECT 
@@ -656,12 +649,15 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
                 current_nail.collision_state = Nail.NAIL_STATE.FAIL;
             }
         }
-        else if (current_nail.disturb_type == Nail.DISTURB_TYPE.TWICE_SPEED)
+
+        if (current_nail.disturb_type == Nail.DISTURB_TYPE.TWICE_SPEED ||
+            current_nail.disturb_type == Nail.DISTURB_TYPE.PERFECT_SPEED)
         {
             drill_operate_speed = drill_speed;
             play_disturb_speed_text_ani.gameObject.SetActive(false);
         }
-        else if (current_nail.disturb_type == Nail.DISTURB_TYPE.SLOW_SPEED)
+        else if (current_nail.disturb_type == Nail.DISTURB_TYPE.SLOW_SPEED ||
+            current_nail.disturb_type == Nail.DISTURB_TYPE.PERFECT_SLOW)
         {
             drill_operate_speed = drill_speed;
             play_disturb_slow_speed_text_ani.gameObject.SetActive(false);
@@ -683,10 +679,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
 
     public UIPlayTween play_fail_text_ani;
-    public UIPlayTween play_good_text_ani;
-    public UIPlayTween play_perfect_text_ani;
-    public UIPlayTween play_amazing_text_ani;
-    
     
     public UILabel speed_value;
     
@@ -796,31 +788,9 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         box.Stop();
         current_nail.Stop();
 
-        current_game_mode.TapUp();        
-                
         int point = 0;
-        if (current_nail.collision_state == Nail.NAIL_STATE.GOOD)
-        {
-            play_good_text_ani.gameObject.SetActive(true);
-            play_good_text_ani.Play(true);
-            point = 1;
-            SoundManager.PlayGoodPerfect();
-        }
-        if (current_nail.collision_state == Nail.NAIL_STATE.PERFECT)
-        {
-            play_perfect_text_ani.gameObject.SetActive(true);
-            play_perfect_text_ani.Play(true);
-            point = 2;
-            SoundManager.PlayGoodPerfect();
-        }
-        if(current_nail.collision_state == Nail.NAIL_STATE.AMAZING)
-        {
-            play_amazing_text_ani.gameObject.SetActive(true);
-            play_amazing_text_ani.Play(true);
-            point = 3;
-            SoundManager.PlayAmazing();
-        }
-
+        current_game_mode.TapUp(ref point);
+                
         nail_point += point;
 
         current_nail.Clear(this);
@@ -892,7 +862,13 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     }
 
     Nail current_nail;
-    void SetDrillPositionToCurrentNail()
+
+    public Nail GetCurrentNail()
+    {
+        return current_nail;
+    }
+
+    public void SetDrillPositionToCurrentNail()
     {
         drill.SetDrillPositionToTarget(current_nail.transform);
 
@@ -1032,5 +1008,10 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public void ReStartGameImmediately()
     {
         StartCoroutine(ReStartGameImmediatelySequence());
+    }
+
+    public void ShowLeaderBoard()
+    {
+        current_game_mode.ShowLeaderBoard();
     }
 }

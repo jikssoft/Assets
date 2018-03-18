@@ -25,7 +25,7 @@ namespace SA.Analytics.Google {
 	#endif
 	public class GA_Settings : ScriptableObject {
 
-		public static string VERSION_NUMBER = "4.7/21";
+		public static string VERSION_NUMBER = "4.8/" + SA.Common.Config.LIB_VERSION;
 		
 		[SerializeField]
 		public List<Profile> accounts =  new List<Profile>();

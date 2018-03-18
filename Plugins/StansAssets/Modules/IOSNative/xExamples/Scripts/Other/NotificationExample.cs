@@ -11,6 +11,8 @@ using System;
 using UnityEngine;
 using System.Collections;
 
+using SA.IOSNative.UserNotifications;
+
 
 
 public class NotificationExample : BaseIOSFeaturePreview {
@@ -26,9 +28,22 @@ public class NotificationExample : BaseIOSFeaturePreview {
 	void Awake() {
 		
 
+
 		ISN_LocalNotificationsController.OnLocalNotificationReceived += HandleOnLocalNotificationReceived;
 
 
+
+
+        NotificationCenter.OnWillPresentNotification += (NotificationRequest obj) => {
+            Debug.Log("OnWillPresentNotification: " + obj.Content);
+        };
+
+        var launchNotification = NotificationCenter.LaunchNotification;
+        if(launchNotification.Content != null) {
+            IOSMessage.Create("Launch Notification", "Messgae: " + launchNotification.Content + "\nNotification ID: " + launchNotification.Id);
+        }
+
+       
 
 
 		//Checking for a local launch notification
@@ -176,6 +191,7 @@ public class NotificationExample : BaseIOSFeaturePreview {
 			content.Subtitle = "Subtitle_";
 			content.Body = "Body_";
 			content.Badge = 1;
+            content.Sound = "beep.mp3";
 			content.UserInfo ["404"] = "test User Info";
 
 

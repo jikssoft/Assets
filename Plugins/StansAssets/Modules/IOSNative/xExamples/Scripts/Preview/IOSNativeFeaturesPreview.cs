@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class IOSNativeFeaturesPreview : BaseIOSFeaturePreview {
 
+    public float x;
+
+
 
 	public static IOSNativePreviewBackButton back = null;
 

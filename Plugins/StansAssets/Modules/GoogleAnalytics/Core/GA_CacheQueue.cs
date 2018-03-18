@@ -7,6 +7,10 @@ namespace SA.Analytics.Google {
 		
 	public class CacheQueue : SA.Common.Pattern.Singleton<CacheQueue> {
 
+		void Awake(){
+			DontDestroyOnLoad (gameObject);    
+		}
+
 
 		private bool IsWorking = false;
 		private CachedRequest _CurrentRequest = null;

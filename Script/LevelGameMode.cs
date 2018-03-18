@@ -182,7 +182,24 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
 
         system.build_nail_table = true;
 
-        yield return null;
+        
+    }
+
+    public void SetDrillPosition()
+    {
+        system.drill.StartCoroutine(
+            system.drill.SetDrillPositionToTarget(system.GetCurrentNail().transform, 0.2f, 0f, true));
+    }
+
+    public void MoveBoxAndDrill()
+    {
+        float time = 0.3f;
+        iTween.ScaleTo(system.box.gameObject, iTween.Hash("scale", new Vector3(0.7f, 0.7f, 0.7f), "time", time, "easetype", iTween.EaseType.linear));
+        system.drill.StartCoroutine(system.drill.SetDrillPositionToTarget(system.drill_clear_point.transform, time, 0f, true));
+        system.box.Reset(2f);
+        system.drill_time_gause.DisableGauseTime();
+
+        UpdatePreFailClearGUI(time);
     }
 
     bool first_run_level_13 = true;
@@ -228,9 +245,35 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
         }
     }
 
-    public void TapUp()
+    public UIPlayTween play_good_text_ani;
+    public UIPlayTween play_perfect_text_ani;
+    public UIPlayTween play_amazing_text_ani;
+
+    public void TapUp(ref int point)
     {
         count_clear_nail--;
+
+        if (system.GetCurrentNail().collision_state == Nail.NAIL_STATE.GOOD)
+        {
+            play_good_text_ani.gameObject.SetActive(true);
+            play_good_text_ani.Play(true);
+            point = 1;
+            SoundManager.PlayGoodPerfect();
+        }
+        if (system.GetCurrentNail().collision_state == Nail.NAIL_STATE.PERFECT)
+        {
+            play_perfect_text_ani.gameObject.SetActive(true);
+            play_perfect_text_ani.Play(true);
+            point = 2;
+            SoundManager.PlayGoodPerfect();
+        }
+        if (system.GetCurrentNail().collision_state == Nail.NAIL_STATE.AMAZING)
+        {
+            play_amazing_text_ani.gameObject.SetActive(true);
+            play_amazing_text_ani.Play(true);
+            point = 3;
+            SoundManager.PlayAmazing();
+        }
     }
     
     public void ProcessClearGamePoint()
@@ -338,5 +381,10 @@ public class LevelGameMode : MonoBehaviour, GameMainLogicSystem.GameMode {
     {
         game_ui_obj.SetActive(false);
         cheerup_guide_controller.Hide();
+    }
+
+    public void ShowLeaderBoard()
+    {
+        LeaderBoardManager.ShowBestLevel();
     }
 }

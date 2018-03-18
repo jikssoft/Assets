@@ -25,82 +25,82 @@ static ISN_UserNotifications * un_sharedInstance;
 
 + (id)sharedInstance {
 
-	if (un_sharedInstance == nil)  {
-		un_sharedInstance = [[self alloc] init];
-	}
+    if (un_sharedInstance == nil)  {
+        un_sharedInstance = [[self alloc] init];
+    }
 
-	return un_sharedInstance;
+    return un_sharedInstance;
 }
 
 - (void)requestPermissions {
 
-	[UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
-		NSString *sendString;
-		if (granted) {
-			sendString = @"success";
-		} else {
-			sendString = @"failure";
-		}
-		UnitySendMessage("SA.IOSNative.UserNotifications.NativeReceiver", "RequestPermissionsCallbackEvent", [ISN_DataConvertor NSStringToChar:sendString]);
-	}];
+    [UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        NSString *sendString;
+        if (granted) {
+            sendString = @"success";
+        } else {
+            sendString = @"failure";
+        }
+        UnitySendMessage("SA.IOSNative.UserNotifications.NativeReceiver", "RequestPermissionsCallbackEvent", [ISN_DataConvertor NSStringToChar:sendString]);
+    }];
 }
 
 - (void)cancelUserNotifications {
-	[[UNUserNotificationCenter currentNotificationCenter] removeAllPendingNotificationRequests];
+    [[UNUserNotificationCenter currentNotificationCenter] removeAllPendingNotificationRequests];
 }
 
 - (void)cancelUserNotificationById:(NSString *)notificationId {
     NSArray *notificationsArray = [NSArray arrayWithObject:notificationId];
-	[[UNUserNotificationCenter currentNotificationCenter] removePendingNotificationRequestsWithIdentifiers:notificationsArray];
+    [[UNUserNotificationCenter currentNotificationCenter] removePendingNotificationRequestsWithIdentifiers:notificationsArray];
 }
 
 - (void)scheduleNotification:(NSString*)notification {
-	NSError *error = nil;
+    NSError *error = nil;
 
-	id object = [NSJSONSerialization
-		JSONObjectWithData:[notification dataUsingEncoding:NSUTF8StringEncoding]
-		options:0
-		error:&error];
+    id object = [NSJSONSerialization
+        JSONObjectWithData:[notification dataUsingEncoding:NSUTF8StringEncoding]
+        options:0
+        error:&error];
 
-	if(error) { /* JSON was malformed, act appropriately here */ }
+    if(error) { /* JSON was malformed, act appropriately here */ }
 
-	if([object isKindOfClass:[NSDictionary class]])
-	{
-		NSDictionary *notification = object;
+    if([object isKindOfClass:[NSDictionary class]])
+    {
+        NSDictionary *notification = object;
 
-		NSDictionary *contentDict = [notification objectForKey:@"content"];
-		NSString *notificationID = [notification objectForKey:@"id"];
+        NSDictionary *contentDict = [notification objectForKey:@"content"];
+        NSString *notificationID = [notification objectForKey:@"id"];
 
-		UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+        UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
 
-		content.title = [contentDict objectForKey:@"title"];
-		content.subtitle = [contentDict objectForKey:@"subtitle"];
-		content.body = [contentDict objectForKey:@"body"];
-		content.badge = [contentDict objectForKey:@"badge"];
-		content.launchImageName = [contentDict objectForKey:@"launchImageName"];
-		NSDictionary *userInfo = [contentDict objectForKey:@"userInfo"];
+        content.title = [contentDict objectForKey:@"title"];
+        content.subtitle = [contentDict objectForKey:@"subtitle"];
+        content.body = [contentDict objectForKey:@"body"];
+        
+        content.sound = [UNNotificationSound soundNamed:[contentDict objectForKey:@"sound"]];
+        content.badge = [contentDict objectForKey:@"badge"];
+        content.launchImageName = [contentDict objectForKey:@"launchImageName"];
+        NSDictionary *userInfo = [contentDict objectForKey:@"userInfo"];
 
         if (userInfo) {
             content.userInfo = userInfo;
         }
-		content.categoryIdentifier = @"notification";
-		content.sound = [UNNotificationSound defaultSound];
+        content.categoryIdentifier = @"notification";
+        NSDictionary *triggerDict = [notification objectForKey:@"trigger"];
 
-		NSDictionary *triggerDict = [notification objectForKey:@"trigger"];
+        UNNotificationTrigger *trigger;
 
-		UNNotificationTrigger *trigger;
+        int repeats = [[triggerDict objectForKey:@"repeats"] integerValue];
+        BOOL repeat = false;
+        if (repeats != 0) {
+            repeat = true;
+        }
 
-		int repeats = [[triggerDict objectForKey:@"repeats"] integerValue];
-		BOOL repeat = false;
-		if (repeats != 0) {
-			repeat = true;
-		}
+        if ([triggerDict objectForKey:@"intervalToFire"] != nil) {
+            NSTimeInterval timeInterval = [[triggerDict objectForKey:@"intervalToFire"] integerValue];
 
-		if ([triggerDict objectForKey:@"intervalToFire"] != nil) {
-			NSTimeInterval timeInterval = [[triggerDict objectForKey:@"intervalToFire"] integerValue];
-
-			trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:timeInterval repeats:repeat];
-		} else {
+            trigger = [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:timeInterval repeats:repeat];
+        } else {
 
             NSDateComponents *components = [[NSDateComponents alloc]init];;
 
@@ -130,24 +130,24 @@ static ISN_UserNotifications * un_sharedInstance;
             }
 
             trigger = [UNCalendarNotificationTrigger triggerWithDateMatchingComponents:components repeats:repeat];
-		}
+        }
 
-		UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:notificationID                                                                           content:content trigger:trigger];
+        UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:notificationID                                                                           content:content trigger:trigger];
 
-		UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+        UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
 
-		[center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
-			NSString *sendPrefix = [NSString stringWithFormat:@"%@%@", notificationID, UNITY_SPLITTER2];
-			NSString *sendString;
-			if (!error) {
-				sendString = [sendPrefix stringByAppendingString:@"success"];
-			} else {
-				sendString = [sendPrefix stringByAppendingString:@"error"];
-			}
-			UnitySendMessage("SA.IOSNative.UserNotifications.NativeReceiver", "AddNotificationRequestEvent", [ISN_DataConvertor NSStringToChar:sendString]);
-		}];
+        [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+            NSString *sendPrefix = [NSString stringWithFormat:@"%@%@", notificationID, UNITY_SPLITTER2];
+            NSString *sendString;
+            if (!error) {
+                sendString = [sendPrefix stringByAppendingString:@"success"];
+            } else {
+                sendString = [sendPrefix stringByAppendingString:@"error"];
+            }
+            UnitySendMessage("SA.IOSNative.UserNotifications.NativeReceiver", "AddNotificationRequestEvent", [ISN_DataConvertor NSStringToChar:sendString]);
+        }];
 
-	}
+    }
 
 }
 
@@ -200,8 +200,17 @@ static ISN_UserNotifications * un_sharedInstance;
 
     NSMutableDictionary *notificationContentDictionary = [[NSMutableDictionary alloc]init];
     [notificationContentDictionary setObject:request.content.title forKey:@"title"];
-    [notificationContentDictionary setObject:request.content.subtitle forKey:@"subtitle"];
+    
+    if(request.content.subtitle != nil) {
+         [notificationContentDictionary setObject:request.content.subtitle forKey:@"subtitle"];
+    } else {
+        [notificationContentDictionary setObject:@"" forKey:@"subtitle"];
+    }
+    
+    
+    
     [notificationContentDictionary setObject:request.content.body forKey:@"body"];
+    [notificationContentDictionary setObject:@"" forKey:@"sound"];
     [notificationContentDictionary setObject:request.content.badge forKey:@"badge"];
     [notificationContentDictionary setObject:request.content.launchImageName forKey:@"launchImageName"];
     [notificationContentDictionary setObject:[request.content.userInfo AsJSONString] forKey:@"userInfo"];
@@ -233,31 +242,31 @@ static ISN_UserNotifications * un_sharedInstance;
 extern "C" {
 
 
-	//--------------------------------------
-	//  IOS Native Plugin Section
-	//--------------------------------------
+    //--------------------------------------
+    //  IOS Native Plugin Section
+    //--------------------------------------
 
 
-	void _ISN_RequestUserNotificationPermissions() {
-		[ISN_UserNotifications.sharedInstance requestPermissions];
-	}
+    void _ISN_RequestUserNotificationPermissions() {
+        [ISN_UserNotifications.sharedInstance requestPermissions];
+    }
 
-	void _ISN_ScheduleUserNotification(char* jsonString) {
-		[ISN_UserNotifications.sharedInstance scheduleNotification:[ISN_DataConvertor charToNSString:jsonString]];
-	}
+    void _ISN_ScheduleUserNotification(char* jsonString) {
+        [ISN_UserNotifications.sharedInstance scheduleNotification:[ISN_DataConvertor charToNSString:jsonString]];
+    }
 
-	void _ISN_CancelUserNotifications() {
-		[ISN_UserNotifications.sharedInstance cancelUserNotifications];
-	}
+    void _ISN_CancelUserNotifications() {
+        [ISN_UserNotifications.sharedInstance cancelUserNotifications];
+    }
 
-	void _ISN_CancelUserNotificationById(char* nId) {
-		NSString* notificationID = [ISN_DataConvertor charToNSString:nId];
-		[ISN_UserNotifications.sharedInstance cancelUserNotificationById:notificationID];
-	}
+    void _ISN_CancelUserNotificationById(char* nId) {
+        NSString* notificationID = [ISN_DataConvertor charToNSString:nId];
+        [ISN_UserNotifications.sharedInstance cancelUserNotificationById:notificationID];
+    }
 
-	void _ISN_GetPendingNotifications() {
-		[ISN_UserNotifications.sharedInstance getPendingNotifications];
-	}
+    void _ISN_GetPendingNotifications() {
+        [ISN_UserNotifications.sharedInstance getPendingNotifications];
+    }
 }
 
 

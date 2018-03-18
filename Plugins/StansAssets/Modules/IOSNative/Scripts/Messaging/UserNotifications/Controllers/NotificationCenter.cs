@@ -34,6 +34,10 @@ namespace SA.IOSNative.UserNotifications {
 		private static Action<List<NotificationRequest>> OnPendingNotificationsCallback;
 		private static Action<SA.Common.Models.Result> RequestPermissionsCallback;
 
+
+        public static event Action<NotificationRequest> OnWillPresentNotification = delegate { };
+
+
 		static NotificationCenter() {
 			NativeReceiver.Instance.Init ();
 
@@ -56,15 +60,9 @@ namespace SA.IOSNative.UserNotifications {
 		[DllImport ("__Internal")]
 		private static extern void _ISN_GetPendingNotifications();
 
-
-		//inside app controller
-
-		[DllImport ("__Internal")]
-		private static extern string _ISN_GetLunchUserNotification();
-
 		#endif
 
-		public static NotificationRequest launchNotificationRequest;
+		public static NotificationRequest LastNotificationRequest;
 
 		public static void RequestPermissions(Action<SA.Common.Models.Result> callback) {
 			RequestPermissionsCallback = callback;
@@ -112,15 +110,9 @@ namespace SA.IOSNative.UserNotifications {
 		}
 
 
-		public static SA.IOSNative.UserNotifications.NotificationRequest launchNotification {
+		public static NotificationRequest LaunchNotification {
 			get {
-				#if (UNITY_IPHONE && !UNITY_EDITOR && APP_CONTROLLER_ENABLED) 
-				string data = _ISN_GetLunchUserNotification ();
-				SA.IOSNative.UserNotifications.NotificationRequest request = new SA.IOSNative.UserNotifications.NotificationRequest(data);
-				return request;
-				#else
-				return new SA.IOSNative.UserNotifications.NotificationRequest();
-				#endif
+                return SA.IOSNative.Core.AppController.LaunchNotification;
 			}
 		}
 
@@ -156,7 +148,8 @@ namespace SA.IOSNative.UserNotifications {
 		}
 
 		internal static void WillPresentNotification(string data) {
-			//NotificationRequest request = new NotificationRequest(data);
+			NotificationRequest request = new NotificationRequest(data);
+            OnWillPresentNotification(request);
 		}
 
 		internal static void PendingNotificationsRequestResponse(string data) {
@@ -180,9 +173,9 @@ namespace SA.IOSNative.UserNotifications {
 
 		}
 
-		internal static void SetLaunchNotifification(string data) {
+		internal static void SetLastNotifification(string data) {
 			NotificationRequest request = new NotificationRequest(data);
-			launchNotificationRequest = request;
+			LastNotificationRequest = request;
 		}
 
 	}

@@ -2473,6 +2473,13 @@ extern "C" {
     //--------------------------------------
     //  IOS Native Utility
     //--------------------------------------
+
+    void _ISN_CopyToClipboard(char *text) {
+        
+        NSString *textToCopy = [ISN_DataConvertor charToNSString:text];
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        pasteboard.string = textToCopy;
+    }
     
     void _ISN_SetApplicationBagesNumber(int count) {
         [[ISN_NativeUtility sharedInstance] setApplicationBagesNumber:count];
@@ -2734,22 +2741,15 @@ extern "C" {
         
         return ISN_MakeStringCopy([ISN_DataConvertor NSStringToChar:data]);
     }
-    
-    
-    
+
     
     //--------------------------------------
     //  IOS Native iCloud Section
     //--------------------------------------
     
+
     
-    
-    
-    void _initCloud ()  {
-        // [[CloudManager sharedInstance] initialize];
-    }
-    
-    void _setString(char* key, char* val) {
+    void _ISN_SetString(char* key, char* val) {
         NSString* k = [ISN_DataConvertor charToNSString:key];
         NSString* v = [ISN_DataConvertor charToNSString:val];
         
@@ -2757,14 +2757,14 @@ extern "C" {
     }
     
     
-    void _setDouble(char* key, float val) {
+    void _ISN_SetDouble(char* key, float val) {
         NSString* k = [ISN_DataConvertor charToNSString:key];
         double v = (double) val;
         
         [[CloudManager sharedInstance] setDouble:v key:k];
     }
     
-    void _setData(char* key, char* data) {
+    void _ISN_SetData(char* key, char* data) {
         NSString* k = [ISN_DataConvertor charToNSString:key];
         
         NSString* mDataString = [ISN_DataConvertor charToNSString:data];
@@ -2775,7 +2775,7 @@ extern "C" {
     }
     
     
-    void _requestDataForKey(char* key) {
+    void _ISN_RequestDataForKey(char* key) {
         NSString* k = [ISN_DataConvertor charToNSString:key];
         [[CloudManager sharedInstance] requestDataForKey:k];
     }
@@ -2858,8 +2858,7 @@ extern "C" {
         }
         
     }
-    
-    
+
     
     //--------------------------------------
     //  IOS Native Notifications API Section

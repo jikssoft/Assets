@@ -71,6 +71,8 @@ public class GoogleMobileAdSettingsEditor : Editor {
 
 		GeneralOptions();
 		EditorGUILayout.Space();
+		DownloadSDK();
+		EditorGUILayout.Space();
 		MainSettings();
 		EditorGUILayout.Space();
 		EditorTesting();
@@ -211,6 +213,26 @@ public class GoogleMobileAdSettingsEditor : Editor {
 		EditorGUILayout.Space();
 		
 	}
+
+	private void DownloadSDK() {
+		EditorGUILayout.HelpBox("Download SDK", MessageType.None);
+
+		EditorGUILayout.BeginHorizontal ();
+
+		EditorGUILayout.LabelField ("Google AdMob", GUILayout.Width (150.0f));
+
+		EditorGUILayout.Space();
+
+		if (GUILayout.Button ("[Download SDK]", GUILayout.Width (120.0f))) {
+			Application.OpenURL ("https://developers.google.com/admob/ios/download");
+		}
+		
+		EditorGUILayout.EndHorizontal ();
+		EditorGUILayout.Space ();
+
+	}
+
+
 	
 
 	private void PluginSettings() {
@@ -318,12 +340,12 @@ public class GoogleMobileAdSettingsEditor : Editor {
 		dev.IsOpen = false;
 		GoogleMobileAdSettings.Instance.AddDevice(dev);
 
-
-
-
-
-		
-		
+		if(EditorUserBuildSettings.activeBuildTarget.Equals(BuildTarget.Android))
+			SA.Common.Editor.Tools.ApplicationIdentifier = "com.unionassets.android.plugin.preview";
+		else if(EditorUserBuildSettings.activeBuildTarget.Equals(BuildTarget.iOS))
+			SA.Common.Editor.Tools.ApplicationIdentifier = "com.stansassets.iosnative.dev";
+		else
+			SA.Common.Editor.Tools.ApplicationIdentifier = "com.sa.gma";		
 	}
 	
 	public static void ResetSettings() {

@@ -48,7 +48,7 @@ public class TutorualController : MonoBehaviour {
     public void OperateDrill()
     {
         // 구글 플레이 로딩 중에 튜토리얼 동작 하는 문제 있어 시간으로 막음)
-        if (Time.fixedTime < 3f)
+        if (Time.fixedTime > 3f)
         {
             drill.Operate();
             drill_speed = operate_speed;

@@ -1,3 +1,19 @@
+10.2/24:
+NEW!
+Create additional methods for saving data in iCloud (iOS platform)
+Launch Application by clicking on notification doesn't work (iOS platform)
+Add custom sound for UserNotification (iOS platform)
+
+Overall performance improvements
+Compatibility updates & fixes
+
+Updates:
+Android Native v9.10/24
+iOS Native v9.11/21
+Google Mobile Ads v9.10/24
+WP8 Native v3.4/24
+Amazon Native v2.8/24
+
 10.1/21:
 Overall performance improvements
 Compatibility updates & fixes
