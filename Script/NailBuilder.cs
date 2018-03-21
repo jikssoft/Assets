@@ -313,12 +313,8 @@ public class NailBuilder : MonoBehaviour {
             nail.GetComponent<Nail>().SaveStartPos();
         }
 
-        int speed1 = Random.Range(1, nail_table.Count);
-        int speed2 = Random.Range(1, nail_table.Count);
+        // slow 못 하나만
         int slow1 = Random.Range(1, nail_table.Count);
-
-        ((GameObject)nail_table[speed1]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.TWICE_SPEED);
-        ((GameObject)nail_table[speed2]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.TWICE_SPEED);
         ((GameObject)nail_table[slow1]).GetComponent<Nail>().SetDisturbType(Nail.DISTURB_TYPE.SLOW_SPEED);
 
         BuildCoinNail(nail_table);

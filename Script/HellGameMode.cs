@@ -99,7 +99,7 @@ public class HellGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(third_time);
 
-
+        FastGuidePopup();
 
     }
 
@@ -134,7 +134,7 @@ public class HellGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(third_time);
 
-
+        FastGuidePopup();
     }
 
     public void MoveBoxAndDrill()
@@ -202,7 +202,18 @@ public class HellGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public void FastGuidePopup()
     {
+        if (dataSystem.GetCheckFastNail() == true)
+        {
+            return;
+        }
 
+        fast_nail_guide_popup.gameObject.SetActive(true);
+        fast_nail_guide_popup.GetComponent<BlurController>().Blur();
+
+        ActiveAnimation.Play(fast_nail_guide_popup.GetComponent<Animation>(), "ShowFailPopup", AnimationOrTween.Direction.Forward);
+        ReturnKeyManager.RegisterReturnKeyProcess(fast_nail_guide_popup.GetComponent<ReturnKeyProcess>());
+
+        dataSystem.SetCheckFastNail();
     }
     
 
@@ -297,7 +308,7 @@ public class HellGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
     public bool CheckInterstitialAD()
     {
-        if (count_clear_nail >= 60)
+        if (count_clear_nail >= 40)
         {
             return true;
         }
