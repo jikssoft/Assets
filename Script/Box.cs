@@ -184,6 +184,24 @@ public class Box : MonoBehaviour {
         */
     }
 
+    public float GetBoxHalfHeight()
+    {
+        float retval = 0;
+
+        if (box_type == Box.BOX_TYPE.RECTANGLE)
+        {
+            retval = current_box_anchor.GetComponentInChildren<BoxCollider2D>().size.y *
+                current_box_anchor.transform.localScale.y / 2f;
+        }
+        else
+        {
+            retval = current_box_anchor.GetComponentInChildren<CircleCollider2D>().radius *
+                current_box_anchor.transform.localScale.y;
+        }
+
+        return retval;
+    }
+
     public void AdjustLevelModeBox()
     {
         current_box_anchor.transform.parent.localPosition = new Vector3(0f, 0f, 0f);

@@ -99,11 +99,17 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
 
         yield return new WaitForSeconds(third_time);
 
+        box_shadow.SetActive(true);
+        box_shadow.transform.position = new Vector3(0,
+            system.box.transform.position.y -
+            system.box.GetBoxHalfHeight());
+
         FastGuidePopup();
 
     }
 
- 
+
+    public GameObject box_shadow;
     public IEnumerator ReStartGame(float first_time, float second_time, float third_time)
     {
         yield return new WaitForSeconds(first_time);
@@ -128,10 +134,16 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
         system.build_nail_table = true;
 
         yield return new WaitForSeconds(second_time);
-        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, -2.58f, 0f), "time", 0.3f, "islocal", true));
+        float y_init_pos = -2.58f;
+        iTween.MoveTo(system.box.gameObject, iTween.Hash("position", new Vector3(0f, y_init_pos, 0f), "time", 0.3f, "islocal", true));
+
+        box_shadow.SetActive(true);
+        box_shadow.transform.position = new Vector3(0,
+            y_init_pos - 
+            system.box.GetBoxHalfHeight());
 
         yield return new WaitForSeconds(third_time);
-
+       
         FastGuidePopup();
     }
 
@@ -182,8 +194,13 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
             re_position_start_nail_index = system.nail_table.Count - unit_max_count_nail;
         }
 
-        yield return new WaitForSeconds(0.1f);
+        box_shadow.SetActive(true);
+        box_shadow.transform.position = new Vector3(0,
+            system.box.transform.position.y -
+            system.box.GetBoxHalfHeight());
 
+        yield return new WaitForSeconds(0.1f);
+        
         system.box.SetFrontBoxToLast();
         system.builder.SetRePositionNail(system.nail_table,
                 re_position_start_nail_index,
@@ -351,6 +368,8 @@ public class InfinityGameMode : MonoBehaviour, GameMainLogicSystem.GameMode
     {
         bg.SetActive(false);
         game_ui_obj.SetActive(false);
+
+        box_shadow.SetActive(false);
     }
 
     public void ShowLeaderBoard()
