@@ -28,6 +28,7 @@ public class OptionPopup : MonoBehaviour, ReturnKeyProcess {
     public UILabel language;
     public UISprite flag;
     public LanguagePopup language_popup;
+    public UIButton restore_button;
 
     public void ShowOptionMenu()
     {
@@ -79,6 +80,16 @@ public class OptionPopup : MonoBehaviour, ReturnKeyProcess {
                 break;
             }
         }
+
+        if(purchase_drill_manager.DisabledInApp() == true)
+        {
+            restore_button.gameObject.SetActive(false);
+        }
+        else
+        {
+            restore_button.gameObject.SetActive(true);
+        }
+            
 
         //BannerController.HideBanner();
 

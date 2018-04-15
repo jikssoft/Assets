@@ -50,7 +50,7 @@ public class GachaDrillPopup : MonoBehaviour, ReturnKeyProcess {
         gacha_controller.gameObject.SetActive(false);
 
         int randomIndex = UnityEngine.Random.Range(1, drill_shop_list.drill_table.Count);
-        while (IsLimitedDrill((int)(drill_shop_list.drill_index_table[randomIndex])) == true)
+        while (IsLimitedDrillOrUnpuchasedDrill((int)(drill_shop_list.drill_index_table[randomIndex])) == true)
         {
             randomIndex = UnityEngine.Random.Range(1, drill_shop_list.drill_table.Count);
         }
@@ -99,6 +99,7 @@ public class GachaDrillPopup : MonoBehaviour, ReturnKeyProcess {
         Register();
     }
 
+
     public UITexture limited_drill_texture;
     public GameObject limeted_drill_text;
     public UILabel limeted_drill_level_text;
@@ -144,19 +145,23 @@ public class GachaDrillPopup : MonoBehaviour, ReturnKeyProcess {
         ReturnKeyManager.RegisterReturnKeyProcess(this);
     }
 
-    public bool IsLimitedDrill(int index)
+    public bool IsLimitedDrillOrUnpuchasedDrill(int index)
     {
-        bool limited_drill = false;
         foreach (int limited_index in drill_selector.limited_drill_index)
         {
             if (limited_index == index)
             {
-                limited_drill = true;
-                break;
+                return true;
             }
         }
 
-        return limited_drill;
+        if(drill_shop_list.purchase_drill_manager.DisabledInApp() == true &&
+            drill_shop_list.purchase_drill_manager.GetCoinPrice(index) < 0)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     public void ChangeLayersRecursively(Transform trans, string name)

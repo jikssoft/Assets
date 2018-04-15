@@ -360,6 +360,10 @@ public class DrillShopList : MonoBehaviour, ReturnKeyProcess, Rewardable {
         check_button.enabled = true;
         check_button.gameObject.GetComponent<UISprite>().spriteName = "button_red";
 		check_button.gameObject.GetComponent<UIButton>().normalSprite = "button_red";
+        
+        check_button.transform.GetChild(0).gameObject.SetActive(true);
+        check_button.transform.GetChild(1).gameObject.SetActive(false);
+        check_button.transform.GetChild(2).gameObject.SetActive(false);
     }
 
     public void SelectDrill(int shop_index, GameObject selectedDrill)
@@ -419,6 +423,7 @@ public class DrillShopList : MonoBehaviour, ReturnKeyProcess, Rewardable {
             GameDataSystem dataSystem = systemObj.GetComponent<GameDataSystem>();
 
             icon_limited_drill.gameObject.SetActive(false);
+            check_button.transform.GetChild(2).gameObject.SetActive(false);
 
             if (dataSystem.IsCollectDrill(collector_index) == true)
             {
@@ -433,15 +438,61 @@ public class DrillShopList : MonoBehaviour, ReturnKeyProcess, Rewardable {
             }
             else
             {
-				
-
-				if (isLimitedDrill (collector_index) == true) {
+                
+                if (isLimitedDrill (collector_index) == true) {
 					icon_limited_drill.gameObject.SetActive (true);
 					selectedDrill.transform.GetChild (0).gameObject.SetActive (true);
 					check_button.enabled = false;
-					check_button.gameObject.GetComponent<UISprite> ().spriteName = "bg_black";
+                    check_button.transform.GetChild(0).gameObject.SetActive(true);
+                    check_button.transform.GetChild(1).gameObject.SetActive(false);
+                    check_button.gameObject.GetComponent<UISprite> ().spriteName = "bg_black";
 					check_button.gameObject.GetComponent<UIButton>().normalSprite = "bg_black";
-				} else {
+				}
+                else if (purchase_drill_manager.DisabledInApp() == true)
+                {
+                    int coin_price = purchase_drill_manager.GetCoinPrice(last_selected_sellector_index);
+                    
+                    // 뽑기 못함. 온니 돈
+                    if (coin_price < 0)
+                    {
+                        icon_limited_drill.gameObject.SetActive(true);
+                    }
+
+                    coin_price = Math.Abs(coin_price);
+                    check_button.transform.GetChild(2).gameObject.SetActive(true);
+
+                    // 돈 있으면 버튼 활성화
+                    if (dataSystem.GetCoin() >= coin_price)
+                    {
+                        purchased_drill = true;
+                        check_button.gameObject.GetComponent<UISprite>().spriteName = "button_red";
+                        check_button.gameObject.GetComponent<UIButton>().normalSprite = "button_red";
+
+                        check_button.transform.GetChild(0).gameObject.SetActive(false);
+
+                        check_button.transform.GetChild(1).gameObject.GetComponent<UILabel>().text = coin_price.ToString();
+                        check_button.transform.GetChild(1).gameObject.SetActive(true);
+
+                        check_button.transform.GetChild(2).gameObject.GetComponent<UISprite>().color = Color.white;
+
+                        check_button.enabled = true;
+                    }
+                    else
+                    {
+                        check_button.transform.GetChild(0).gameObject.SetActive(false);
+
+                        check_button.transform.GetChild(1).gameObject.GetComponent<UILabel>().text = coin_price.ToString();
+                        check_button.transform.GetChild(1).gameObject.SetActive(true);
+
+                        check_button.gameObject.GetComponent<UISprite>().spriteName = "bg_black";
+                        check_button.gameObject.GetComponent<UIButton>().normalSprite = "bg_black";
+
+                        check_button.transform.GetChild(2).gameObject.GetComponent<UISprite>().color = Color.gray;
+
+                        check_button.enabled = false;
+                    }
+                }
+                else {
 
 					string local_price = purchase_drill_manager.GetLocalizedPrice ();
 					if (local_price != null) 
@@ -674,9 +725,19 @@ public class DrillShopList : MonoBehaviour, ReturnKeyProcess, Rewardable {
 
 		data_system.PurchaseDrill(last_selected_sellector_index);
 
-		ScrollDrill (last_selected_shop_index);
-		//SelectDrill(shop_index, selected_drill);
-	}
+        UpdateCoin();
+
+        GameObject purchased_drill = ((GameObject)(drill_table[last_selected_shop_index]));
+
+        GameObject new_icon = Instantiate(new_label_icon, purchased_drill.transform, false);
+        new_icon.transform.parent = purchased_drill.transform;
+
+        ScrollDrill (last_selected_shop_index);
+        //SelectDrill(shop_index, selected_drill);
+
+        
+
+    }
 
     public GameObject shop_drill_menu;
     public IEnumerator Return(bool checked_drill)

@@ -8,58 +8,112 @@ using SA.Analytics.Google;
 public class PurchaseDrillManager : MonoBehaviour {
 
     public string[] iphone_purchase_table =
-        {"com.twocm.tapdrill.purchase.default.drill",
-        "com.twocm.tapdrill.purchase.burger.drill",
-        "com.twocm.tapdrill.purchase.brush.drill",
-        "com.twocm.tapdrill.purchase.egg.drill",
-        "com.twocm.tapdrill.purchase.fakebook.drill",
-        "com.twocm.tapdrill.purchase.basketballshoes.drill",
-        "com.twocm.tapdrill.purchase.sunbulb.drill",
-        "com.twocm.tapdrill.purchase.coffeemachine.drill",
-        "com.twocm.tapdrill.purchase.dynamite.drill",
+        {"com.twocm.tapdrill.purchase.default.drill", // 0
+        "com.twocm.tapdrill.purchase.burger.drill", // 1000
+        "com.twocm.tapdrill.purchase.brush.drill", // 1000
+        "com.twocm.tapdrill.purchase.egg.drill", // 500 
+        "com.twocm.tapdrill.purchase.fakebook.drill", // 500
+        "com.twocm.tapdrill.purchase.basketballshoes.drill", //2000
+        "com.twocm.tapdrill.purchase.sunbulb.drill", // 2000
+        "com.twocm.tapdrill.purchase.coffeemachine.drill", // 1000
+        "com.twocm.tapdrill.purchase.dynamite.drill", // 2000, x
         "keyboard.drill",
-        "com.twocm.tapdrill.purchase.fish.drill",
+        "com.twocm.tapdrill.purchase.fish.drill", // 500
         "gold.drill",
         "green.drill",
-        "com.twocm.tapdrill.purchase.gun.drill",
-        "com.twocm.tapdrill.purchase.honey.drill",
-        "com.twocm.tapdrill.purchase.hook.drill",
-        "com.twocm.tapdrill.purchase.lance.drill",
+        "com.twocm.tapdrill.purchase.gun.drill", // 2000
+        "com.twocm.tapdrill.purchase.honey.drill", // 1000
+        "com.twocm.tapdrill.purchase.hook.drill", // 500
+        "com.twocm.tapdrill.purchase.lance.drill", // 500
         "laser.drill",
-        "com.twocm.tapdrill.purchase.lolipop.drill",
-        "com.twocm.tapdrill.purchase.speakermic.drill",
-        "com.twocm.tapdrill.purchase.milk.drill",
-        "com.twocm.tapdrill.purchase.moon.drill",
-        "com.twocm.tapdrill.purchase.pen.drill",
-        "com.twocm.tapdrill.purchase.metal.drill",
+        "com.twocm.tapdrill.purchase.lolipop.drill", // 500
+        "com.twocm.tapdrill.purchase.speakermic.drill", // 500
+        "com.twocm.tapdrill.purchase.milk.drill", // 500
+        "com.twocm.tapdrill.purchase.moon.drill", // 500, x
+        "com.twocm.tapdrill.purchase.pen.drill", // 500
+        "com.twocm.tapdrill.purchase.metal.drill", // 1000
         "worldcup.drill",
         "nego.drill",
-        "com.twocm.tapdrill.purchase.ufo.drill",
-        "com.twocm.tapdrill.purchase.icepolarbear.drill",
+        "com.twocm.tapdrill.purchase.ufo.drill", // 1000, x
+        "com.twocm.tapdrill.purchase.icepolarbear.drill", // 1000
         "icecoke.drill",
-        "com.twocm.tapdrill.purchase.corn.drill",
+        "com.twocm.tapdrill.purchase.corn.drill", // 500
         "revolver.drill",
         "skull.drill",
-        "com.twocm.tapdrill.purchase.smartphone.drill",
-        "com.twocm.tapdrill.purchase.soap.drill",
-        "com.twocm.tapdrill.purchase.stone.drill",
-        "com.twocm.tapdrill.purchase.thief.drill",
-        "com.twocm.tapdrill.purchase.thor.drill",
-        "com.twocm.tapdrill.purchase.white.drill",
-        "com.twocm.tapdrill.purchase.wood.drill",
-        "com.twocm.tapdrill.purchase.woodpecker.drill",
-        "com.twocm.tapdrill.purchase.blue.drill",
+        "com.twocm.tapdrill.purchase.smartphone.drill", // 500, x
+        "com.twocm.tapdrill.purchase.soap.drill", // 500
+        "com.twocm.tapdrill.purchase.stone.drill", // 500
+        "com.twocm.tapdrill.purchase.thief.drill", // 1000, x
+        "com.twocm.tapdrill.purchase.thor.drill", // 2000
+        "com.twocm.tapdrill.purchase.white.drill", // 1000
+        "com.twocm.tapdrill.purchase.wood.drill", // 2000
+        "com.twocm.tapdrill.purchase.woodpecker.drill", // 2000
+        "com.twocm.tapdrill.purchase.blue.drill", // 1000
         "yellow.drill",
-        "com.twocm.tapdrill.purchase.sflaser.drill",
+        "com.twocm.tapdrill.purchase.sflaser.drill", // 2000
         "goldrock.drill",
-        "com.twocm.tapdrill.purchase.brickman.drill",
-        "com.twocm.tapdrill.purchase.rainbow.drill",
-        "com.twocm.tapdrill.purchase.rolex.drill",
-        "com.twocm.tapdrill.purchase.squirrel.drill",
-        "com.twocm.tapdrill.purchase.alarm.drill",
-        "com.twocm.tapdrill.purchase.weather.drill",
-		"com.twocm.tapdrill.purchase.test",
-        "com.twocm.tapdrill.purchase.corgi.drill"};
+        "com.twocm.tapdrill.purchase.brickman.drill", //2000, x
+        "com.twocm.tapdrill.purchase.rainbow.drill", // 1000, x
+        "com.twocm.tapdrill.purchase.rolex.drill", // 500, x
+        "com.twocm.tapdrill.purchase.squirrel.drill", // 500
+        "com.twocm.tapdrill.purchase.alarm.drill", //  500
+        "com.twocm.tapdrill.purchase.weather.drill", // 500
+        "com.twocm.tapdrill.purchase.corgi.drill"}; // 500,x
+
+    public int[] purchase_table_coin_price =
+        { 0,
+        1000,
+        1000,
+        500,
+        500,
+        2000,
+        2000,
+        1000,
+        -2000,
+        0,
+        500,
+        0,
+        0,
+        2000,
+        1000,
+        500,
+        500,
+        0,
+        500,
+        500,
+        500,
+        -500,
+        500,
+        1000,
+        0,
+        0,
+        -1000,
+        1000,
+        0,
+        500,
+        0,
+        0,
+        -500,
+        500,
+        500,
+        -1000,
+        2000,
+        1000,
+        2000,
+        2000,
+        1000,
+        0,
+        2000,
+        0,
+        -2000,
+        -1000,
+        -500,
+        500,
+        500,
+        500,
+        -500};
+
+    static bool disable_ios_inapp = true;
 
 	static string iphone_add_id = ".add";
 
@@ -72,7 +126,7 @@ public class PurchaseDrillManager : MonoBehaviour {
 
         store_inited = false;
 
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        if (Application.platform == RuntimePlatform.IPhonePlayer && disable_ios_inapp == false)
         {
             foreach (string id in iphone_purchase_table)
             {
@@ -202,22 +256,40 @@ public class PurchaseDrillManager : MonoBehaviour {
 
 	public LoadingController loading_controller;
 
-	public void PurchaseDrill(int index)
+	public void PurchaseDrill(int selector_index)
 	{
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        
+
+        if (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.WindowsEditor  )
         {
-            PaymentManager.OnTransactionComplete -= IPhone_OnTransactionComplete;
-            PaymentManager.OnTransactionComplete += IPhone_PaymentManager_OnTransactionComplete;
-			PaymentManager.Instance.BuyProduct(iphone_purchase_table[index] + iphone_add_id);
+            if (disable_ios_inapp == true)
+            {
+                
+                GameObject systemObj = GameObject.FindGameObjectWithTag("System");
+                GameDataSystem data_system = systemObj.GetComponent<GameDataSystem>();
+
+                data_system.SetCoin(data_system.GetCoin() - System.Math.Abs(GetCoinPrice(selector_index)), true);
+
+                drill_shop_list.CompletePurchaseDrill();
+                Manager.Client.SendTransactionHit("purchase drill", iphone_purchase_table[selector_index], "$", 0.99f, 0f, 0f);
+            }
+            else
+            {
+                PaymentManager.OnTransactionComplete -= IPhone_OnTransactionComplete;
+                PaymentManager.OnTransactionComplete += IPhone_PaymentManager_OnTransactionComplete;
+                PaymentManager.Instance.BuyProduct(iphone_purchase_table[selector_index] + iphone_add_id);
+                loading_controller.ShowLoading();
+            }
         }
         else if(Application.platform == RuntimePlatform.Android)
         {
             AndroidInAppPurchaseManager.ActionProductPurchased += Android_OnProductPurchased;
-            AndroidInAppPurchaseManager.Client.Purchase(iphone_purchase_table[index]);
+            AndroidInAppPurchaseManager.Client.Purchase(iphone_purchase_table[selector_index]);
+            loading_controller.ShowLoading();
         }
 
-        drill_index = index;
-        loading_controller.ShowLoading ();
+        drill_index = selector_index;
+        
 
         
 
@@ -297,7 +369,20 @@ public class PurchaseDrillManager : MonoBehaviour {
 		return local_currency;
 	}
 
-	
+	public int GetCoinPrice(int selector_index)
+    {
+        if (selector_index > 0 && selector_index < purchase_table_coin_price.Length)
+        {
+            return purchase_table_coin_price[selector_index];
+        }
+
+        return 0;
+    }
+
+    public bool DisabledInApp()
+    {
+        return disable_ios_inapp && Application.platform == RuntimePlatform.IPhonePlayer;
+    }
 
 	private bool complete_restored_message;
 	public void RestoreDrill(bool complete_message)
@@ -314,7 +399,7 @@ public class PurchaseDrillManager : MonoBehaviour {
 			data_system.ResetPurchaseDrill ();
 		}
         
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        if (Application.platform == RuntimePlatform.IPhonePlayer && disable_ios_inapp == false)
         {
             complete_restored_message = complete_message;
             PaymentManager.OnTransactionComplete += IPhone_OnTransactionComplete;
