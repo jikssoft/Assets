@@ -2,7 +2,6 @@
 using System.Collections;
 using System;
 using SA.Analytics.Google;
-using GameAnalyticsSDK;
 
 public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 {
@@ -115,7 +114,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         {
             return;
         }
-        
         drill.StopDrillIdleSound();
         input_system.SetActive(false);
         StopDisturb();
@@ -150,7 +148,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
         else
         {
             StartCoroutine(FailState());
-            GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "game", nail_point);
         }
 
         continue_state = false;
@@ -242,8 +239,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
         ActiveAnimation.Play(game_ui_animation, "ShowInGameMenu", AnimationOrTween.Direction.Forward);
         game_ui_animation.GetComponent<GameMenuUI>().ShowStarLevelMenuButton();
-
-        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Complete, "game", nail_point);
     }
 
     void MoveBoxAndDrill()
@@ -320,7 +315,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     public bool build_nail_table;
     public IEnumerator StartGame()
     {
-        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "game");
         current_game_mode.UpdateGUI();
         tap_process = false;
         iTween.MoveTo(box.gameObject, new Vector3(0f, 0f, 0f), 1f);
@@ -719,7 +713,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
     
     IEnumerator ReStartGame()
     {
-        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "game");
         if (tap_process == false)
         {
             yield break;
@@ -949,7 +942,6 @@ public class GameMainLogicSystem : MonoBehaviour, ReturnKeyProcess
 
     IEnumerator ReStartGameImmediatelySequence()
     {
-        GameAnalytics.NewProgressionEvent(GAProgressionStatus.Start, "game");
         if (tap_process == false)
         {
             yield break;
